@@ -10,6 +10,8 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Configuration;
 using System.IO;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace GoogleClashofClansLauncher
 {
@@ -24,6 +26,15 @@ namespace GoogleClashofClansLauncher
         
         // 配置文件路径
         private string configFilePath;
+        private Dictionary<string, ApiInfo> apiConfigurations = new Dictionary<string, ApiInfo>();
+        private List<string> customApis = new List<string>();
+
+        // API信息类
+        private class ApiInfo
+        {
+            public string Endpoint { get; set; }
+            public string Key { get; set; }
+        }
 
         public SettingsForm()
         {
@@ -34,8 +45,71 @@ namespace GoogleClashofClansLauncher
             // 初始化配置文件路径
             configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "appsettings.json");
             
+            // 添加预定义的AI API接口
+            AddPredefinedApis();
             // 加载保存的设置
             LoadSavedSettings();
+        }
+
+        private void AddPredefinedApis()
+        {
+            // 添加常见的AI API接口
+            apiConfigurations.Add("OpenAI GPT-3.5", new ApiInfo { 
+                Endpoint = "https://api.openai.com/v1/chat/completions", 
+                Key = "sk-" 
+            });
+            apiConfigurations.Add("OpenAI GPT-4", new ApiInfo { 
+                Endpoint = "https://api.openai.com/v1/chat/completions", 
+                Key = "sk-" 
+            });
+            apiConfigurations.Add("Anthropic Claude", new ApiInfo { 
+                Endpoint = "https://api.anthropic.com/v1/messages", 
+                Key = "sk-ant-" 
+            });
+            apiConfigurations.Add("Google Gemini", new ApiInfo { 
+                Endpoint = "https://generativelanguage.googleapis.com/v1beta/models", 
+                Key = "AIzaSy" 
+            });
+            apiConfigurations.Add("百度文心一言", new ApiInfo { 
+                Endpoint = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop", 
+                Key = "" 
+            });
+            apiConfigurations.Add("阿里通义千问", new ApiInfo { 
+                Endpoint = "https://dashscope.aliyuncs.com/api/v1/services", 
+                Key = "sk-" 
+            });
+            apiConfigurations.Add("腾讯混元大模型", new ApiInfo { 
+                Endpoint = "https://api.tencentcloudapi.com", 
+                Key = "" 
+            });
+            apiConfigurations.Add("讯飞星火认知大模型", new ApiInfo { 
+                Endpoint = "https://spark-api.xf-yun.com/v3.1/chat", 
+                Key = "" 
+            });
+            apiConfigurations.Add("豆包", new ApiInfo { 
+                Endpoint = "https://api.doubao.com/chat/completions", 
+                Key = "db-" 
+            });
+
+            // 加载ComboBox
+            LoadApiComboBox();
+        }
+
+        private void LoadApiComboBox()
+        {
+            apiComboBox.Items.Clear();
+            
+            // 添加预定义API
+            foreach (var apiName in apiConfigurations.Keys)
+            {
+                apiComboBox.Items.Add(apiName);
+            }
+            
+            // 添加自定义API
+            foreach (var customApi in customApis)
+            {
+                apiComboBox.Items.Add(customApi);
+            }
         }
         
         private void LoadSavedSettings()
@@ -45,23 +119,45 @@ namespace GoogleClashofClansLauncher
                 if (File.Exists(configFilePath))
                 {
                     string jsonContent = File.ReadAllText(configFilePath);
-                    // 简单解析JSON配置
-                    if (jsonContent.Contains("\"ApiEndpoint\":\""))
+                    var config = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(jsonContent);
+                    
+                    // 加载API配置
+                    if (config.ContainsKey("ApiEndpoint"))
                     {
-                        int startIndex = jsonContent.IndexOf("\"ApiEndpoint\":\"") + 14;
-                        int endIndex = jsonContent.IndexOf("\"", startIndex);
-                        if (startIndex > 13 && endIndex > startIndex)
-                        {
-                            apiEndpointTextBox.Text = jsonContent.Substring(startIndex, endIndex - startIndex);
-                        }
+                        apiEndpointTextBox.Text = config["ApiEndpoint"]?.ToString() ?? "";
                     }
-                    if (jsonContent.Contains("\"ApiKey\":\""))
+                    
+                    if (config.ContainsKey("ApiKey"))
                     {
-                        int startIndex = jsonContent.IndexOf("\"ApiKey\":\"") + 10;
-                        int endIndex = jsonContent.IndexOf("\"", startIndex);
-                        if (startIndex > 9 && endIndex > startIndex)
+                        apiKeyTextBox.Text = config["ApiKey"]?.ToString() ?? "";
+                    }
+
+                    // 加载自定义API
+                    if (config.ContainsKey("CustomApis"))
+                    {
+                        try
                         {
-                            apiKeyTextBox.Text = jsonContent.Substring(startIndex, endIndex - startIndex);
+                            var customApisArray = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(config["CustomApis"]?.ToString() ?? "[]");
+                            if (customApisArray != null)
+                            {
+                                customApis = customApisArray;
+                                LoadApiComboBox();
+                            }
+                        }
+                        catch { }
+                    }
+
+                    // 加载选定的API
+                    if (config.ContainsKey("SelectedApi"))
+                    {
+                        string selectedApi = config["SelectedApi"]?.ToString();
+                        if (!string.IsNullOrEmpty(selectedApi))
+                        {
+                            int index = apiComboBox.FindStringExact(selectedApi);
+                            if (index >= 0)
+                            {
+                                apiComboBox.SelectedIndex = index;
+                            }
                         }
                     }
                 }
@@ -99,20 +195,37 @@ namespace GoogleClashofClansLauncher
                         return;
                     }
                 }
-                
-                // 构建配置JSON
-                string apiEndpoint = apiEndpointTextBox.Text ?? string.Empty;
-                string apiKey = apiKeyTextBox.Text ?? string.Empty;
-                
-                // 构建配置JSON
-                string jsonConfig = "{\n" +
-                                   "  \"ApiEndpoint\": \"" + apiEndpoint.Replace("\"", "\\\"") + "\",\n" +
-                                   "  \"ApiKey\": \"" + apiKey.Replace("\"", "\\\"") + "\"\n" +
-                                   "}";
-                
-                // 保存到文件
-                File.WriteAllText(configFilePath, jsonConfig);
-                
+
+                // 创建配置字典
+                var config = new Dictionary<string, dynamic>
+                {
+                    { "ApiEndpoint", apiEndpointTextBox.Text },
+                    { "ApiKey", apiKeyTextBox.Text }
+                };
+
+                // 保存选定的API
+                if (apiComboBox.SelectedIndex >= 0)
+                {
+                    config["SelectedApi"] = apiComboBox.SelectedItem.ToString();
+                }
+
+                // 保存自定义API列表
+                if (customApis.Count > 0)
+                {
+                    config["CustomApis"] = Newtonsoft.Json.JsonConvert.SerializeObject(customApis);
+                }
+
+                // 确保配置目录存在
+                string configDir = Path.GetDirectoryName(configFilePath);
+                if (!Directory.Exists(configDir))
+                {
+                    Directory.CreateDirectory(configDir);
+                }
+
+                // 保存配置文件
+                string jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(config, Newtonsoft.Json.Formatting.Indented);
+                File.WriteAllText(configFilePath, jsonContent);
+
                 statusLabel.Text = "设置已保存";
                 Debug.WriteLine("API设置已保存");
                 
@@ -127,141 +240,64 @@ namespace GoogleClashofClansLauncher
             }
         }
 
-        private void settingsRecognitionButton_Click(object sender, EventArgs e)
+        private void apiComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            try
+            if (apiComboBox.SelectedIndex >= 0)
             {
-                // 尝试激活游戏窗口
-                if (!ActivateGameWindow())
-                {
-                    Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
-                    statusLabel.Text = "未能找到或激活游戏窗口";
-                    return;
-                }
-
-                // 显示正在识别的状态
-                settingsRecognitionButton.Text = "正在识别图像...";
-                settingsRecognitionButton.Enabled = false;
-                statusLabel.Text = "正在识别图像...";
-                Debug.WriteLine("开始识别设置图像");
-
-                // 使用Task在后台线程中执行图像识别，避免UI冻结
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        // 等待窗口激活
-                        Thread.Sleep(200);
-
-                        // 调用图像识别并点击功能，使用res/2/002.png
-                        bool success = imageRecognition.RecognizeAndClickResImage("002", "2");
-
-                        // 更新UI状态
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            if (success)
-                            {
-                                settingsRecognitionButton.Text = "识别并点击成功! (res/2/002.png)";
-                                statusLabel.Text = "识别并点击成功";
-                                Debug.WriteLine("设置图像识别并点击成功");
-                            }
-                            else
-                            {
-                                settingsRecognitionButton.Text = "未找到图像，请重试 (res/2/002.png)";
-                                statusLabel.Text = "未找到图像或点击失败";
-                                Debug.WriteLine("未找到设置图像或点击失败");
-                            }
-
-                            // 恢复按钮状态
-                            Thread.Sleep(1000);
-                            settingsRecognitionButton.Text = "识别设置图像并点击 (res/2/002.png)";
-                            settingsRecognitionButton.Enabled = true;
-                            statusLabel.Text = "就绪";
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine("设置图像识别过程中发生错误: " + ex.Message);
-                        // 发生异常时恢复按钮状态
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            settingsRecognitionButton.Text = "识别设置图像并点击 (res/2/002.png)";
-                            settingsRecognitionButton.Enabled = true;
-                            statusLabel.Text = "发生错误: " + ex.Message;
-                        });
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("设置按钮点击处理异常: " + ex.Message);
-                settingsRecognitionButton.Text = "识别设置图像并点击 (res/2/002.png)";
-                settingsRecognitionButton.Enabled = true;
-                statusLabel.Text = "发生错误: " + ex.Message;
-            }
-        }
-
-        private bool ActivateGameWindow()
-        {
-            // 尝试通过进程名和窗口标题关键字查找并激活窗口
-            Process[] processes = Process.GetProcessesByName(ProcessName);
-            
-            foreach (Process process in processes)
-            {
-                try
-                {
-                    // 尝试获取窗口标题
-                    if (!string.IsNullOrEmpty(process.MainWindowTitle) && 
-                        process.MainWindowTitle.Contains(WindowTitleKeyword))
-                    {
-                        windowManager.ActivateWindow(process.MainWindowHandle);
-                        return true;
-                    }
-                }
-                catch { /* 忽略访问被拒绝的异常 */ }
-            }
-            
-            // 如果通过进程名没找到，尝试通过窗口标题关键字枚举所有窗口
-            IntPtr windowHandle = FindWindowByKeyword(WindowTitleKeyword);
-            if (windowHandle != IntPtr.Zero)
-            {
-                windowManager.ActivateWindow(windowHandle);
-                return true;
-            }
-            
-            return false;
-        }
-
-        // 通过关键字模糊查找窗口
-        private IntPtr FindWindowByKeyword(string keyword)
-        {
-            IntPtr foundWindow = IntPtr.Zero;
-            NativeMethods.EnumWindows((hWnd, lParam) =>
-            {
-                StringBuilder title = new StringBuilder(256);
-                NativeMethods.GetWindowText(hWnd, title, title.Capacity);
+                string selectedApi = apiComboBox.SelectedItem.ToString();
                 
-                if (title.ToString().Contains(keyword))
+                // 检查是否是预定义API
+                if (apiConfigurations.ContainsKey(selectedApi))
                 {
-                    foundWindow = hWnd;
-                    return false; // 停止枚举
+                    ApiInfo apiInfo = apiConfigurations[selectedApi];
+                    apiEndpointTextBox.Text = apiInfo.Endpoint;
+                    apiKeyTextBox.Text = apiInfo.Key;
                 }
-                return true; // 继续枚举
-            }, IntPtr.Zero);
-            
-            return foundWindow;
+                else
+                {
+                    // 对于自定义API，我们只保存了名称，用户需要重新输入地址和密钥
+                    // 这里可以考虑进一步扩展，保存自定义API的完整配置
+                    apiEndpointTextBox.Text = "";
+                    apiKeyTextBox.Text = "";
+                }
+            }
         }
 
-        // 嵌套类用于存放Win32 API声明
-        private static class NativeMethods
+        private void addCustomApiButton_Click(object sender, EventArgs e)
         {
-            [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-            public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+            string customApiName = customApiNameTextBox.Text.Trim();
+            
+            if (string.IsNullOrEmpty(customApiName))
+            {
+                statusLabel.Text = "请输入自定义API名称";
+                return;
+            }
 
-            [DllImport("user32.dll")]
-            public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+            if (apiConfigurations.ContainsKey(customApiName) || customApis.Contains(customApiName))
+            {
+                statusLabel.Text = "该API名称已存在";
+                return;
+            }
 
-            public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+            // 添加自定义API
+            customApis.Add(customApiName);
+            
+            // 刷新ComboBox
+            LoadApiComboBox();
+            
+            // 选择新添加的API
+            int index = apiComboBox.FindStringExact(customApiName);
+            if (index >= 0)
+            {
+                apiComboBox.SelectedIndex = index;
+            }
+
+            // 清空输入框
+            customApiNameTextBox.Text = "";
+            
+            statusLabel.Text = "自定义API已添加";
         }
+
+        // 已移除识别设置图像的功能和相关窗口操作代码
     }
 }
