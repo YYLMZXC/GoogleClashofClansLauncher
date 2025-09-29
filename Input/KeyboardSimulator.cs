@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Diagnostics;
 
 namespace GoogleClashofClansLauncher.Input;
 
@@ -24,11 +25,48 @@ public class KeyboardSimulator
         downInput[0].type = InputSimulator.INPUT_KEYBOARD;
         downInput[0].u.ki.wVk = (ushort)keyCode;
         downInput[0].u.ki.dwFlags = KEYEVENTF_KEYDOWN;
-        InputSimulator.SendInput(1, downInput, Marshal.SizeOf(typeof(InputSimulator.INPUT)));
+        uint result = InputSimulator.SendInput(1, downInput, Marshal.SizeOf(typeof(InputSimulator.INPUT)));
 
-        Thread.Sleep(50); // 模拟按键延迟
+        // 验证输入是否成功发送
+        if (result == 0)
+        {
+            int error = Marshal.GetLastWin32Error();
+            Debug.WriteLine("按键按下失败，错误码: " + error);
+        }
+
+        Thread.Sleep(10); // 降低延迟，从50ms改为10ms
 
         // 释放键
+        var upInput = new InputSimulator.INPUT[1];
+        upInput[0].type = InputSimulator.INPUT_KEYBOARD;
+        upInput[0].u.ki.wVk = (ushort)keyCode;
+        upInput[0].u.ki.dwFlags = KEYEVENTF_KEYUP;
+        result = InputSimulator.SendInput(1, upInput, Marshal.SizeOf(typeof(InputSimulator.INPUT)));
+
+        if (result == 0)
+        {
+            int error = Marshal.GetLastWin32Error();
+            Debug.WriteLine("按键释放失败，错误码: " + error);
+        }
+    }
+
+    /// <summary>
+    /// 直接按下键（不释放）
+    /// </summary>
+    private void KeyDown(VirtualKeyCode keyCode)
+    {
+        var downInput = new InputSimulator.INPUT[1];
+        downInput[0].type = InputSimulator.INPUT_KEYBOARD;
+        downInput[0].u.ki.wVk = (ushort)keyCode;
+        downInput[0].u.ki.dwFlags = KEYEVENTF_KEYDOWN;
+        InputSimulator.SendInput(1, downInput, Marshal.SizeOf(typeof(InputSimulator.INPUT)));
+    }
+
+    /// <summary>
+    /// 直接释放键
+    /// </summary>
+    private void KeyUp(VirtualKeyCode keyCode)
+    {
         var upInput = new InputSimulator.INPUT[1];
         upInput[0].type = InputSimulator.INPUT_KEYBOARD;
         upInput[0].u.ki.wVk = (ushort)keyCode;
@@ -56,7 +94,7 @@ public class KeyboardSimulator
             else
                 PressKey(keyCode);
 
-            Thread.Sleep(50);
+            Thread.Sleep(10); // 降低延迟，从50ms改为10ms
         }
     }
 
@@ -70,11 +108,38 @@ public class KeyboardSimulator
             'A' => VirtualKeyCode.VK_A,
             'B' => VirtualKeyCode.VK_B,
             'C' => VirtualKeyCode.VK_C,
-            // ... 省略其他字母（根据需要补充）
+            'D' => VirtualKeyCode.VK_D,
+            'E' => VirtualKeyCode.VK_E,
+            'F' => VirtualKeyCode.VK_F,
+            'G' => VirtualKeyCode.VK_G,
+            'H' => VirtualKeyCode.VK_H,
+            'I' => VirtualKeyCode.VK_I,
+            'J' => VirtualKeyCode.VK_J,
+            'K' => VirtualKeyCode.VK_K,
+            'L' => VirtualKeyCode.VK_L,
+            'M' => VirtualKeyCode.VK_M,
+            'N' => VirtualKeyCode.VK_N,
+            'O' => VirtualKeyCode.VK_O,
+            'P' => VirtualKeyCode.VK_P,
+            'Q' => VirtualKeyCode.VK_Q,
+            'R' => VirtualKeyCode.VK_R,
+            'S' => VirtualKeyCode.VK_S,
+            'T' => VirtualKeyCode.VK_T,
+            'U' => VirtualKeyCode.VK_U,
+            'V' => VirtualKeyCode.VK_V,
+            'W' => VirtualKeyCode.VK_W,
+            'X' => VirtualKeyCode.VK_X,
+            'Y' => VirtualKeyCode.VK_Y,
             'Z' => VirtualKeyCode.VK_Z,
             '0' => VirtualKeyCode.VK_0,
             '1' => VirtualKeyCode.VK_1,
-            // ... 省略其他数字（根据需要补充）
+            '2' => VirtualKeyCode.VK_2,
+            '3' => VirtualKeyCode.VK_3,
+            '4' => VirtualKeyCode.VK_4,
+            '5' => VirtualKeyCode.VK_5,
+            '6' => VirtualKeyCode.VK_6,
+            '7' => VirtualKeyCode.VK_7,
+            '8' => VirtualKeyCode.VK_8,
             '9' => VirtualKeyCode.VK_9,
             ' ' => VirtualKeyCode.SPACE,
             '.' => VirtualKeyCode.OEM_PERIOD,
@@ -96,11 +161,14 @@ public class KeyboardSimulator
     /// </summary>
     private void PressKeyWithShift(VirtualKeyCode keyCode)
     {
-        // 按下Shift
-        PressKey(VirtualKeyCode.SHIFT);
-        // 按下目标键
-        PressKey(keyCode);
-        // 释放Shift（PressKey已包含释放逻辑）
+        // 修正的实现：先按下Shift，然后按下目标键，最后释放Shift
+        KeyDown(VirtualKeyCode.SHIFT);
+        Thread.Sleep(5);
+        KeyDown(keyCode);
+        Thread.Sleep(10);
+        KeyUp(keyCode);
+        Thread.Sleep(5);
+        KeyUp(VirtualKeyCode.SHIFT);
     }
 }
 

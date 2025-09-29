@@ -29,7 +29,8 @@ namespace GoogleClashofClansLauncher
             // 检查是否已有crosvm.exe进程在运行
             if (IsProcessRunning(ProcessName))
             {
-                MessageBox.Show("检测到Google Play Games模拟器已经在运行中。", "信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // 不再显示消息框，避免干扰用户操作
+                Debug.WriteLine("检测到Google Play Games模拟器已经在运行中。");
             }
         }
 
@@ -43,11 +44,12 @@ namespace GoogleClashofClansLauncher
                 // 尝试激活游戏窗口
                 if (!ActivateGameWindow())
                 {
-                    MessageBox.Show("未能找到或激活部落冲突游戏窗口，请手动切换到游戏窗口后再试。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    // 简化提示信息
+                    Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
                 }
                 
-                // 延迟1秒后执行模拟输入
-                Thread.Sleep(1000);
+                // 降低延迟时间，从1秒改为200毫秒
+                Thread.Sleep(200);
                 keyboardSimulator.TypeText(textToSimulate);
             }
         }
@@ -57,11 +59,12 @@ namespace GoogleClashofClansLauncher
             // 尝试激活游戏窗口
             if (!ActivateGameWindow())
             {
-                MessageBox.Show("未能找到或激活部落冲突游戏窗口，请手动切换到游戏窗口后再试。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // 简化提示信息
+                Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
             }
             
-            // 延迟1秒后执行固定的"123"输入
-            Thread.Sleep(1000);
+            // 降低延迟时间，从1秒改为200毫秒
+            Thread.Sleep(200);
             keyboardSimulator.TypeText("123");
         }
 
