@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Diagnostics;
 using GoogleClashofClansLauncher.Core;
+using GoogleClashofClansLauncher.Core.System;
+using GoogleClashofClansLauncher.Core.UI;
 using System.Windows.Forms; // 添加这个引用以便使用Screen类
 
 namespace GoogleClashofClansLauncher.Input;
@@ -18,7 +20,7 @@ namespace GoogleClashofClansLauncher.Input;
 public class ImageRecognition
 {
     // 功能控制标志 - 设置为true启用图像识别功能
-    private const bool FEATURE_ENABLED = true;
+    private const bool FEATURE_ENABLED = false;
     
     private const int SRCCOPY = 0x00CC0020;
     private const int CAPTUREBLT = 0x40000000;
@@ -96,28 +98,21 @@ public class ImageRecognition
         return bitmap;
     }
 
-    /// <summary>
-    /// 加载模板图像
-    /// </summary>
-    /// <param name="imagePath">图像路径</param>
-    /// <returns>加载的位图</returns>
-    private Bitmap LoadTemplateImage(string imagePath)
+    public Bitmap? CaptureWindow(IntPtr handle)
     {
-        if (!File.Exists(imagePath))
-        {
-            Debug.WriteLine("模板图像不存在: " + imagePath);
-            return null;
-        }
+        if (!FEATURE_ENABLED) return null;
+        // Implementation for capturing a window
+        throw new NotImplementedException();
+    }
 
-        try
-        {
-            return new Bitmap(imagePath);
+    public bool FindImage(Bitmap screenshot, Image template, out Point matchPoint, double threshold)
+    {
+        if (!FEATURE_ENABLED) {
+            matchPoint = Point.Empty;
+            return false;
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine("加载模板图像失败: " + ex.Message);
-            return null;
-        }
+        // Implementation for finding an image
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -136,7 +131,7 @@ public class ImageRecognition
             return Point.Empty;
         }
         
-        Bitmap template = LoadTemplateImage(templatePath);
+        Bitmap? template = LoadTemplateImage(templatePath);
         if (template == null)
             return Point.Empty;
 
@@ -218,6 +213,34 @@ public class ImageRecognition
         }
 
         return (double)matchedPixels / totalPixels;
+    }
+
+    /// <summary>
+    /// 加载模板图像
+    /// </summary>
+    /// <param name="templatePath">模板图像路径</param>
+    /// <returns>加载的位图，如果失败则返回null</returns>
+    private Bitmap? LoadTemplateImage(string templatePath)
+    {
+        if (!File.Exists(templatePath))
+        {
+            Debug.WriteLine($"模板图像文件不存在: {templatePath}");
+            return null;
+        }
+
+        try
+        {
+            // 从文件加载图像，然后立即关闭文件流，避免文件锁定
+            using (var bmpTemp = new Bitmap(templatePath))
+            {
+                return new Bitmap(bmpTemp);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"加载模板图像失败: {ex.Message}");
+            return null;
+        }
     }
 
     /// <summary>

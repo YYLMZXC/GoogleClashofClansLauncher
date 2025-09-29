@@ -1,5 +1,6 @@
 using GoogleClashofClansLauncher.Input;
-using GoogleClashofClansLauncher.Core;
+using GoogleClashofClansLauncher.Core.System;
+using GoogleClashofClansLauncher.Core.UI;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
@@ -9,8 +10,10 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 using System.IO;
 using System.Drawing.Imaging;
+using GoogleClashofClansLauncher.Core;
+using GoogleClashofClansLauncher.Game;
 
-namespace GoogleClashofClansLauncher
+namespace GoogleClashofClansLauncher.UI
 {
     public partial class Form1 : Form
     {
@@ -128,64 +131,41 @@ namespace GoogleClashofClansLauncher
                 // 不再显示消息框，避免干扰用户操作
                 Debug.WriteLine("检测到Google Play Games模拟器已经在运行中。");
             }
-            
-            // 加载设置按钮图标
-            try
+
+            // 寻找项目根目录
+            string? projectDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory)?.Parent?.Parent?.Parent?.FullName;
+            while (projectDir != null && !Directory.GetFiles(projectDir, "*.sln").Any())
             {
-                // 使用相对路径加载Res/2文件夹下的002.ico图标
-                string appDir = Path.GetDirectoryName(Application.ExecutablePath);
-                string projectDir = appDir;
-                
-                // 尝试向上查找项目根目录，直到找到Res文件夹
-                for (int i = 0; i < 3; i++)
-                {
-                    string possibleResDir = Path.Combine(projectDir, "Res");
-                    if (Directory.Exists(possibleResDir))
-                    {
-                        break;
-                    }
-                    projectDir = Path.GetDirectoryName(projectDir);
-                    if (string.IsNullOrEmpty(projectDir)) break;
-                }
-                
-                string iconPath = Path.Combine(projectDir ?? appDir, "Res", "2", "002.ico");
-                
+                projectDir = Directory.GetParent(projectDir)?.FullName;
+            }
+
+            if (projectDir != null)
+            {
+                // 加载设置按钮的图标
+                string iconPath = Path.Combine(projectDir, "res", "Icon_1.png");
                 if (File.Exists(iconPath))
                 {
-                    using (Icon icon = new Icon(iconPath))
+                    try
                     {
-                        settingsButton.Image = icon.ToBitmap();
-                        settingsButton.Text = "";
+                        // 加载图标并设置为按钮背景图
+                        Image icon = Image.FromFile(iconPath);
+                        settingsButton.Image = new Bitmap(icon, new Size(32, 32)); // 调整图标大小
                         settingsButton.ImageAlign = ContentAlignment.MiddleCenter;
-                        Debug.WriteLine("成功加载图标: " + iconPath);
+                        settingsButton.Text = ""; // 移除文本
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("加载图标失败: " + ex.Message);
                     }
                 }
                 else
                 {
-                    Debug.WriteLine("图标文件不存在: " + iconPath);
-                    
-                    // 尝试备用路径
-                    string altIconPath = Path.Combine(Application.StartupPath, "Res", "2", "002.ico");
-                    if (File.Exists(altIconPath))
-                    {
-                        using (Icon icon = new Icon(altIconPath))
-                        {
-                            settingsButton.Image = icon.ToBitmap();
-                            settingsButton.Text = "";
-                            settingsButton.ImageAlign = ContentAlignment.MiddleCenter;
-                            Debug.WriteLine("使用备用路径成功加载图标: " + altIconPath);
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine("备用图标路径也不存在: " + altIconPath);
-                    }
+                    Debug.WriteLine("图标文件未找到: " + iconPath);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                Debug.WriteLine("加载图标时发生错误: " + ex.Message);
-                Debug.WriteLine("异常详细信息: " + ex.StackTrace);
+                Debug.WriteLine("未能找到项目根目录，无法加载图标");
             }
         }
 
@@ -429,8 +409,8 @@ namespace GoogleClashofClansLauncher
         }
 
         /// <summary>
-        /// 鼠标点击模拟按钮点击事件
-        /// 实现1秒点击3次，持续10秒的功能
+        /// 点击模拟测试按钮点击事件
+        /// 实现1秒点击3次，持续10秒点击游戏屏幕中间的功能
         /// 使用后台线程执行以避免UI冻结
         /// </summary>
         private void mouseClickButton_Click(object sender, EventArgs e)
@@ -439,8 +419,8 @@ namespace GoogleClashofClansLauncher
             if (cancellationTokenSource != null && !cancellationTokenSource.IsCancellationRequested)
             {
                 cancellationTokenSource.Cancel();
-                mouseClickButton.Text = "开始鼠标点击模拟 (1秒3次，持续10秒)";
-                Debug.WriteLine("鼠标点击模拟已取消");
+                mouseClickButton.Text = "点击模拟测试 (1秒3次，持续10秒)";
+                Debug.WriteLine("点击模拟测试已取消");
                 return;
             }
 
@@ -460,14 +440,14 @@ namespace GoogleClashofClansLauncher
             }
 
             // 更新按钮文本
-            mouseClickButton.Text = "停止鼠标点击模拟";
-            Debug.WriteLine("开始鼠标点击模拟");
+            mouseClickButton.Text = "停止点击模拟测试";
+            Debug.WriteLine("开始点击模拟测试");
 
             // 创建新的取消令牌
             cancellationTokenSource = new CancellationTokenSource();
             CancellationToken token = cancellationTokenSource.Token;
 
-            // 在后台线程中执行鼠标点击模拟
+            // 在后台线程中执行点击模拟测试
             Task.Run(() =>
             {
                 try
@@ -475,47 +455,28 @@ namespace GoogleClashofClansLauncher
                     // 初始延迟
                     Thread.Sleep(200);
 
-                    // 记录开始时间
-                    DateTime startTime = DateTime.Now;
-                    // 持续10秒或直到取消
-                    while ((DateTime.Now - startTime).TotalSeconds < 10 && !token.IsCancellationRequested)
+                    // 使用新方法执行点击模拟测试
+                    // 参数：取消令牌，可选的进度回调函数
+                    mouseSimulator.ExecuteClickTest(token, clickCount =>
                     {
-                        // 1秒内点击3次（间隔约333毫秒）
-                        for (int i = 0; i < 3; i++)
-                        {
-                            if (token.IsCancellationRequested) break;
-                            
-                            // 每次点击前检查鼠标是否在目标窗口内
-                            if (!mouseSimulator.IsMouseInTargetWindow())
-                            {
-                                // 鼠标不在窗口内时等待，但不超过总时间
-                                if (!WaitForMouseInTargetWindow(2000)) // 每次等待2秒
-                                {
-                                    Debug.WriteLine("鼠标离开游戏窗口，停止点击");
-                                    break;
-                                }
-                            }
-                            
-                            mouseSimulator.LeftClick();
-                            // 约333毫秒的间隔
-                            Thread.Sleep(333);
-                        }
-                    }
+                        // 这里可以添加点击计数的UI更新逻辑
+                        Debug.WriteLine($"已点击{clickCount}次");
+                    });
 
                     // 确保UI线程中更新按钮文本
                     this.Invoke((MethodInvoker)delegate
                     {
-                        mouseClickButton.Text = "鼠标点击模拟 (1秒3次，持续10秒)";
+                        mouseClickButton.Text = "点击模拟测试 (1秒3次，持续10秒)";
                     });
 
                     if (!token.IsCancellationRequested)
                     {
-                        Debug.WriteLine("鼠标点击模拟完成");
+                        Debug.WriteLine("点击模拟测试完成");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("鼠标点击模拟发生错误: " + ex.Message);
+                    Debug.WriteLine("点击模拟测试发生错误: " + ex.Message);
                 }
             }, token);
         }

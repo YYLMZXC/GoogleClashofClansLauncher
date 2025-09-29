@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
-namespace GoogleClashofClansLauncher.Core;
+namespace GoogleClashofClansLauncher.Core.System;
 
 /// <summary>
 /// 管理进程的启动和关闭

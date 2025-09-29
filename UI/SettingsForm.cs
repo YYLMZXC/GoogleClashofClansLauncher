@@ -1,5 +1,6 @@
 using GoogleClashofClansLauncher.Input;
-using GoogleClashofClansLauncher.Core;
+using GoogleClashofClansLauncher.Core.System;
+using GoogleClashofClansLauncher.Core.UI;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -13,7 +14,7 @@ using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace GoogleClashofClansLauncher
+namespace GoogleClashofClansLauncher.UI
 {
     public partial class SettingsForm : Form
     {
@@ -25,15 +26,15 @@ namespace GoogleClashofClansLauncher
         private const string WindowTitleKeyword = "部落冲突";
         
         // 配置文件路径
-        private string configFilePath;
+        private string configFilePath = string.Empty;
         private Dictionary<string, ApiInfo> apiConfigurations = new Dictionary<string, ApiInfo>();
         private List<string> customApis = new List<string>();
 
         // API信息类
         private class ApiInfo
         {
-            public string Endpoint { get; set; }
-            public string Key { get; set; }
+            public string Endpoint { get; set; } = string.Empty;
+            public string Key { get; set; } = string.Empty;
         }
 
         public SettingsForm()
@@ -125,44 +126,47 @@ namespace GoogleClashofClansLauncher
                 if (File.Exists(configFilePath))
                 {
                     string jsonContent = File.ReadAllText(configFilePath);
-                    var config = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(jsonContent);
-                    
-                    // 加载API配置
-                    if (config.ContainsKey("ApiEndpoint"))
-                    {
-                        apiEndpointTextBox.Text = config["ApiEndpoint"]?.ToString() ?? "";
-                    }
-                    
-                    if (config.ContainsKey("ApiKey"))
-                    {
-                        apiKeyTextBox.Text = config["ApiKey"]?.ToString() ?? "";
-                    }
+                    var config = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonContent);
 
-                    // 加载自定义API
-                    if (config.ContainsKey("CustomApis"))
+                    if (config != null)
                     {
-                        try
+                        // 加载API配置
+                        if (config.TryGetValue("ApiEndpoint", out var apiEndpoint) && apiEndpoint != null)
                         {
-                            var customApisArray = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(config["CustomApis"]?.ToString() ?? "[]");
-                            if (customApisArray != null)
-                            {
-                                customApis = customApisArray;
-                                LoadApiComboBox();
-                            }
+                            apiEndpointTextBox.Text = apiEndpoint.ToString();
                         }
-                        catch { }
-                    }
 
-                    // 加载选定的API
-                    if (config.ContainsKey("SelectedApi"))
-                    {
-                        string selectedApi = config["SelectedApi"]?.ToString();
-                        if (!string.IsNullOrEmpty(selectedApi))
+                        if (config.TryGetValue("ApiKey", out var apiKey) && apiKey != null)
                         {
-                            int index = apiComboBox.FindStringExact(selectedApi);
-                            if (index >= 0)
+                            apiKeyTextBox.Text = apiKey.ToString();
+                        }
+
+                        // 加载自定义API
+                        if (config.TryGetValue("CustomApis", out var customApisObj) && customApisObj != null)
+                        {
+                            try
                             {
-                                apiComboBox.SelectedIndex = index;
+                                var customApisArray = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(customApisObj.ToString() ?? "[]");
+                                if (customApisArray != null)
+                                {
+                                    customApis = customApisArray;
+                                    LoadApiComboBox();
+                                }
+                            }
+                            catch { }
+                        }
+
+                        // 加载选定的API
+                        if (config.TryGetValue("SelectedApi", out var selectedApiObj) && selectedApiObj != null)
+                        {
+                            string selectedApi = selectedApiObj.ToString() ?? string.Empty;
+                            if (!string.IsNullOrEmpty(selectedApi))
+                            {
+                                int index = apiComboBox.FindStringExact(selectedApi);
+                                if (index >= 0)
+                                {
+                                    apiComboBox.SelectedIndex = index;
+                                }
                             }
                         }
                     }
@@ -170,11 +174,11 @@ namespace GoogleClashofClansLauncher
                 else
                 {
                     // 确保Config目录存在
-                        string configDir = Path.GetDirectoryName(configFilePath);
-                        if (!string.IsNullOrEmpty(configDir))
-                        {
-                            Directory.CreateDirectory(configDir);
-                        }
+                    string configDir = Path.GetDirectoryName(configFilePath) ?? string.Empty;
+                    if (!string.IsNullOrEmpty(configDir))
+                    {
+                        Directory.CreateDirectory(configDir);
+                    }
                     // 设置默认值
                     apiEndpointTextBox.Text = "https://api.example.com/v1/chat/completions";
                 }
@@ -185,7 +189,7 @@ namespace GoogleClashofClansLauncher
                 statusLabel.Text = "加载设置失败: " + ex.Message;
             }
         }
-        
+
         private void saveSettingsButton_Click(object sender, EventArgs e)
         {
             try
@@ -194,7 +198,7 @@ namespace GoogleClashofClansLauncher
                 if (!string.IsNullOrEmpty(apiEndpointTextBox.Text))
                 {
                     Uri uriResult;
-                    if (!Uri.TryCreate(apiEndpointTextBox.Text, UriKind.Absolute, out uriResult) || 
+                    if (!Uri.TryCreate(apiEndpointTextBox.Text, UriKind.Absolute, out uriResult) ||
                         (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
                     {
                         statusLabel.Text = "API地址格式无效";
@@ -210,9 +214,9 @@ namespace GoogleClashofClansLauncher
                 };
 
                 // 保存选定的API
-                if (apiComboBox.SelectedIndex >= 0)
+                if (apiComboBox.SelectedIndex >= 0 && apiComboBox.SelectedItem != null)
                 {
-                    config["SelectedApi"] = apiComboBox.SelectedItem.ToString();
+                    config["SelectedApi"] = apiComboBox.SelectedItem.ToString() ?? string.Empty;
                 }
 
                 // 保存自定义API列表
@@ -222,8 +226,8 @@ namespace GoogleClashofClansLauncher
                 }
 
                 // 确保配置目录存在
-                string configDir = Path.GetDirectoryName(configFilePath);
-                if (!Directory.Exists(configDir))
+                string configDir = Path.GetDirectoryName(configFilePath) ?? string.Empty;
+                if (!string.IsNullOrEmpty(configDir) && !Directory.Exists(configDir))
                 {
                     Directory.CreateDirectory(configDir);
                 }
@@ -234,7 +238,7 @@ namespace GoogleClashofClansLauncher
 
                 statusLabel.Text = "设置已保存";
                 Debug.WriteLine("API设置已保存");
-                
+
                 // 显示保存成功消息
                 MessageBox.Show("设置已成功保存", "保存成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -248,10 +252,10 @@ namespace GoogleClashofClansLauncher
 
         private void apiComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (apiComboBox.SelectedIndex >= 0)
+            if (apiComboBox.SelectedIndex >= 0 && apiComboBox.SelectedItem != null)
             {
-                string selectedApi = apiComboBox.SelectedItem.ToString();
-                
+                string selectedApi = apiComboBox.SelectedItem?.ToString() ?? string.Empty;
+
                 // 检查是否是预定义API
                 if (apiConfigurations.ContainsKey(selectedApi))
                 {
@@ -328,15 +332,15 @@ namespace GoogleClashofClansLauncher
 
         private void editApiButton_Click(object sender, EventArgs e)
         {
-            if (apiComboBox.SelectedIndex >= 0)
+            if (apiComboBox.SelectedIndex >= 0 && apiComboBox.SelectedItem != null)
             {
-                string selectedApi = apiComboBox.SelectedItem.ToString();
-                
+                string selectedApi = apiComboBox.SelectedItem.ToString() ?? string.Empty;
+
                 // 只允许编辑自定义API
                 if (customApis.Contains(selectedApi))
                 {
                     string newApiName = customApiNameTextBox.Text.Trim();
-                    
+
                     if (string.IsNullOrEmpty(newApiName))
                     {
                         statusLabel.Text = "请输入新的API名称";
@@ -344,7 +348,7 @@ namespace GoogleClashofClansLauncher
                     }
 
                     // 检查新名称是否已存在
-                    if ((newApiName != selectedApi) && 
+                    if ((newApiName != selectedApi) &&
                         (apiConfigurations.ContainsKey(newApiName) || customApis.Contains(newApiName)))
                     {
                         statusLabel.Text = "该API名称已存在";
@@ -357,17 +361,17 @@ namespace GoogleClashofClansLauncher
                     {
                         customApis[index] = newApiName;
                     }
-                    
+
                     // 刷新ComboBox
                     LoadApiComboBox();
-                    
+
                     // 选择重命名后的API
                     int newIndex = apiComboBox.FindStringExact(newApiName);
                     if (newIndex >= 0)
                     {
                         apiComboBox.SelectedIndex = newIndex;
                     }
-                    
+
                     statusLabel.Text = "自定义API已重命名";
                 }
             }
@@ -375,28 +379,28 @@ namespace GoogleClashofClansLauncher
 
         private void deleteApiButton_Click(object sender, EventArgs e)
         {
-            if (apiComboBox.SelectedIndex >= 0)
+            if (apiComboBox.SelectedIndex >= 0 && apiComboBox.SelectedItem != null)
             {
-                string selectedApi = apiComboBox.SelectedItem.ToString();
-                
+                string selectedApi = apiComboBox.SelectedItem.ToString() ?? string.Empty;
+
                 // 只允许删除自定义API
                 if (customApis.Contains(selectedApi))
                 {
                     // 显示确认对话框
                     DialogResult result = MessageBox.Show(
-                        $"确定要删除自定义API '{selectedApi}' 吗？", 
-                        "确认删除", 
-                        MessageBoxButtons.YesNo, 
+                        $"确定要删除自定义API '{selectedApi}' 吗？",
+                        "确认删除",
+                        MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning);
-                    
+
                     if (result == DialogResult.Yes)
                     {
                         // 从列表中移除自定义API
                         customApis.Remove(selectedApi);
-                        
+
                         // 刷新ComboBox
                         LoadApiComboBox();
-                        
+
                         // 如果ComboBox还有项，选择第一项
                         if (apiComboBox.Items.Count > 0)
                         {
@@ -412,7 +416,7 @@ namespace GoogleClashofClansLauncher
                             editApiButton.Enabled = false;
                             deleteApiButton.Enabled = false;
                         }
-                        
+
                         statusLabel.Text = "自定义API已删除";
                     }
                 }

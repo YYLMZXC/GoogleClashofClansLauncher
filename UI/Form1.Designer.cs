@@ -1,4 +1,4 @@
-﻿namespace GoogleClashofClansLauncher
+namespace GoogleClashofClansLauncher.UI
 {
     partial class Form1
     {
@@ -82,7 +82,7 @@
             mouseClickButton.Name = "mouseClickButton";
             mouseClickButton.Size = new Size(516, 29);
             mouseClickButton.TabIndex = 4;
-            mouseClickButton.Text = "鼠标点击模拟 (1秒3次，持续10秒)";
+            mouseClickButton.Text = "点击模拟测试 (1秒3次，持续10秒)";
             mouseClickButton.UseVisualStyleBackColor = true;
             mouseClickButton.Click += mouseClickButton_Click;
             // 

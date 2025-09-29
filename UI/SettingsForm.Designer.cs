@@ -1,4 +1,4 @@
-namespace GoogleClashofClansLauncher
+namespace GoogleClashofClansLauncher.UI
 {
     partial class SettingsForm
     {
@@ -415,7 +415,6 @@ namespace GoogleClashofClansLauncher
         }
 
         #endregion
-
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Label apiEndpointLabel;

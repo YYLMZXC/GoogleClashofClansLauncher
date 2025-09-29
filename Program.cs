@@ -1,3 +1,5 @@
+using GoogleClashofClansLauncher.UI;
+
 namespace GoogleClashofClansLauncher;
 
 internal static class Program

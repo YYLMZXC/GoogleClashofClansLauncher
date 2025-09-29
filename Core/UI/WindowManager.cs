@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-namespace GoogleClashofClansLauncher.Core;
+namespace GoogleClashofClansLauncher.Core.UI;
 
 /// <summary>
 /// 管理窗口的查找和激活
