@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Drawing;
 
 namespace GoogleClashofClansLauncher
 {
@@ -15,6 +16,7 @@ namespace GoogleClashofClansLauncher
         private WindowManager windowManager;
         private MouseSimulator mouseSimulator;
         private CancellationTokenSource? cancellationTokenSource;
+        private ImageRecognition imageRecognition;
 
         // 进程名称和窗口标题关键字
         private const string ProcessName = "crosvm";
@@ -26,6 +28,7 @@ namespace GoogleClashofClansLauncher
             keyboardSimulator = new KeyboardSimulator();
             windowManager = new WindowManager();
             mouseSimulator = new MouseSimulator();
+            imageRecognition = new ImageRecognition();
             cancellationTokenSource = null;
         }
 
@@ -199,6 +202,77 @@ namespace GoogleClashofClansLauncher
                     Debug.WriteLine("鼠标点击模拟发生错误: " + ex.Message);
                 }
             }, token);
+        }
+
+        /// <summary>
+        /// 图像识别并点击按钮点击事件
+        /// 识别res/1/001.png图像并点击对应位置
+        /// </summary>
+        private void imageRecognitionButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 尝试激活游戏窗口
+                if (!ActivateGameWindow())
+                {
+                    Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
+                    return;
+                }
+
+                // 显示正在识别的状态
+                imageRecognitionButton.Text = "正在识别图像...";
+                imageRecognitionButton.Enabled = false;
+                Debug.WriteLine("开始识别图像");
+
+                // 使用Task在后台线程中执行图像识别，避免UI冻结
+                Task.Run(() =>
+                {
+                    try
+                    {
+                        // 等待窗口激活
+                        Thread.Sleep(200);
+
+                        // 调用图像识别并点击功能
+                        bool success = imageRecognition.RecognizeAndClickResImage("001", "1");
+
+                        // 更新UI状态
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            if (success)
+                            {
+                                imageRecognitionButton.Text = "识别并点击成功! (res/1/001.png)";
+                                Debug.WriteLine("图像识别并点击成功");
+                            }
+                            else
+                            {
+                                imageRecognitionButton.Text = "未找到图像，请重试 (res/1/001.png)";
+                                Debug.WriteLine("未找到图像或点击失败");
+                            }
+
+                            // 恢复按钮状态
+                            Thread.Sleep(1000);
+                            imageRecognitionButton.Text = "识别图像并点击 (res/1/001.png)";
+                            imageRecognitionButton.Enabled = true;
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("图像识别过程中发生错误: " + ex.Message);
+                        // 发生异常时恢复按钮状态
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            imageRecognitionButton.Text = "识别图像并点击 (res/1/001.png)";
+                            imageRecognitionButton.Enabled = true;
+                        });
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("按钮点击处理异常: " + ex.Message);
+                imageRecognitionButton.Text = "识别图像并点击 (res/1/001.png)";
+                imageRecognitionButton.Enabled = true;
+            }
         }
 
         // Win32 API声明

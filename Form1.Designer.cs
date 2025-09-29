@@ -99,6 +99,32 @@
             this.Name = "Form1";
             this.Text = "键盘与鼠标模拟器";
             this.Load += new System.EventHandler(this.Form1_Load);
+            // 
+            // imageRecognitionButton
+            // 
+            this.imageRecognitionButton = new System.Windows.Forms.Button();
+            this.imageRecognitionButton.Location = new System.Drawing.Point(44, 156);
+            this.imageRecognitionButton.Name = "imageRecognitionButton";
+            this.imageRecognitionButton.Size = new System.Drawing.Size(516, 29);
+            this.imageRecognitionButton.TabIndex = 5;
+            this.imageRecognitionButton.Text = "识别图像并点击 (res/1/001.png)";
+            this.imageRecognitionButton.UseVisualStyleBackColor = true;
+            this.imageRecognitionButton.Click += new System.EventHandler(this.imageRecognitionButton_Click);
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(604, 220);
+            this.Controls.Add(this.imageRecognitionButton);
+            this.Controls.Add(this.mouseClickButton);
+            this.Controls.Add(this.titleLabel);
+            this.Controls.Add(this.fixed123Button);
+            this.Controls.Add(this.simulateButton);
+            this.Controls.Add(this.inputTextBox);
+            this.Name = "Form1";
+            this.Text = "键盘与鼠标模拟器";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -111,5 +137,6 @@
         private System.Windows.Forms.Button fixed123Button;
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Button mouseClickButton;
+        private System.Windows.Forms.Button imageRecognitionButton;
     }
 }
