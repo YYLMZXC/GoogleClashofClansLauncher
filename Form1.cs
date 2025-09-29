@@ -45,7 +45,8 @@ namespace GoogleClashofClansLauncher
             try
             {
                 // 尝试激活游戏窗口
-                if (!ActivateGameWindow())
+                IntPtr windowHandle = ActivateGameWindow();
+                if (windowHandle == IntPtr.Zero)
                 {
                     Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
                     return;
@@ -196,10 +197,19 @@ namespace GoogleClashofClansLauncher
             if (!string.IsNullOrEmpty(textToSimulate))
             {
                 // 尝试激活游戏窗口
-                if (!ActivateGameWindow())
+                IntPtr windowHandle = ActivateGameWindow();
+                if (windowHandle == IntPtr.Zero)
                 {
                     // 简化提示信息
                     Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
+                    return;
+                }
+                
+                // 等待鼠标移动到目标窗口内
+                if (!WaitForMouseInTargetWindow(5000)) // 等待5秒
+                {
+                    Debug.WriteLine("鼠标未在游戏窗口内，操作已取消");
+                    return;
                 }
                 
                 // 降低延迟时间，从1秒改为200毫秒
@@ -208,13 +218,36 @@ namespace GoogleClashofClansLauncher
             }
         }
 
+        private bool WaitForMouseInTargetWindow(int timeoutMs)
+        {
+            DateTime startTime = DateTime.Now;
+            while ((DateTime.Now - startTime).TotalMilliseconds < timeoutMs)
+            {
+                if (mouseSimulator.IsMouseInTargetWindow())
+                {
+                    return true;
+                }
+                Thread.Sleep(100); // 每100毫秒检查一次
+            }
+            return false; // 超时返回false
+        }
+
         private void fixed123Button_Click(object sender, EventArgs e)
         {
             // 尝试激活游戏窗口
-            if (!ActivateGameWindow())
+            IntPtr windowHandle = ActivateGameWindow();
+            if (windowHandle == IntPtr.Zero)
             {
                 // 简化提示信息
                 Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
+                return;
+            }
+            
+            // 等待鼠标移动到目标窗口内
+            if (!WaitForMouseInTargetWindow(5000)) // 等待5秒
+            {
+                Debug.WriteLine("鼠标未在游戏窗口内，操作已取消");
+                return;
             }
             
             // 降低延迟时间，从1秒改为200毫秒
@@ -222,7 +255,7 @@ namespace GoogleClashofClansLauncher
             keyboardSimulator.TypeText("123");
         }
 
-        private bool ActivateGameWindow()
+        private IntPtr ActivateGameWindow()
         {
             // 尝试通过进程名和窗口标题关键字查找并激活窗口
             Process[] processes = Process.GetProcessesByName(ProcessName);
@@ -236,7 +269,10 @@ namespace GoogleClashofClansLauncher
                         process.MainWindowTitle.Contains(WindowTitleKeyword))
                     {
                         windowManager.ActivateWindow(process.MainWindowHandle);
-                        return true;
+                        // 锁定键盘和鼠标模拟器到找到的窗口
+                        keyboardSimulator.SetTargetWindow(process.MainWindowHandle);
+                        mouseSimulator.SetTargetWindow(process.MainWindowHandle);
+                        return process.MainWindowHandle;
                     }
                 }
                 catch { /* 忽略访问被拒绝的异常 */ }
@@ -247,10 +283,13 @@ namespace GoogleClashofClansLauncher
             if (windowHandle != IntPtr.Zero)
             {
                 windowManager.ActivateWindow(windowHandle);
-                return true;
+                // 锁定键盘和鼠标模拟器到找到的窗口
+                keyboardSimulator.SetTargetWindow(windowHandle);
+                mouseSimulator.SetTargetWindow(windowHandle);
+                return windowHandle;
             }
             
-            return false;
+            return IntPtr.Zero;
         }
 
         private bool IsProcessRunning(string processName)
@@ -295,9 +334,17 @@ namespace GoogleClashofClansLauncher
             }
 
             // 尝试激活游戏窗口
-            if (!ActivateGameWindow())
+            IntPtr windowHandle = ActivateGameWindow();
+            if (windowHandle == IntPtr.Zero)
             {
                 Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
+                return;
+            }
+
+            // 等待鼠标移动到目标窗口内
+            if (!WaitForMouseInTargetWindow(5000)) // 等待5秒
+            {
+                Debug.WriteLine("鼠标未在游戏窗口内，操作已取消");
                 return;
             }
 
@@ -326,6 +373,18 @@ namespace GoogleClashofClansLauncher
                         for (int i = 0; i < 3; i++)
                         {
                             if (token.IsCancellationRequested) break;
+                            
+                            // 每次点击前检查鼠标是否在目标窗口内
+                            if (!mouseSimulator.IsMouseInTargetWindow())
+                            {
+                                // 鼠标不在窗口内时等待，但不超过总时间
+                                if (!WaitForMouseInTargetWindow(2000)) // 每次等待2秒
+                                {
+                                    Debug.WriteLine("鼠标离开游戏窗口，停止点击");
+                                    break;
+                                }
+                            }
+                            
                             mouseSimulator.LeftClick();
                             // 约333毫秒的间隔
                             Thread.Sleep(333);
@@ -359,7 +418,8 @@ namespace GoogleClashofClansLauncher
             try
             {
                 // 尝试激活游戏窗口
-                if (!ActivateGameWindow())
+                IntPtr windowHandle = ActivateGameWindow();
+                if (windowHandle == IntPtr.Zero)
                 {
                     Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
                     return;

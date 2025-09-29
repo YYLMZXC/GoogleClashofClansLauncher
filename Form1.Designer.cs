@@ -28,118 +28,112 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.inputTextBox = new System.Windows.Forms.TextBox();
-            this.simulateButton = new System.Windows.Forms.Button();
-            this.fixed123Button = new System.Windows.Forms.Button();
-            this.titleLabel = new System.Windows.Forms.Label();
-            this.SuspendLayout();
-            // 
-            // mouseClickButton
-            // 
-            this.mouseClickButton = new System.Windows.Forms.Button();
+            inputTextBox = new TextBox();
+            simulateButton = new Button();
+            fixed123Button = new Button();
+            titleLabel = new Label();
+            mouseClickButton = new Button();
+            imageRecognitionButton = new Button();
+            settingsButton = new Button();
+            recognize003Button = new Button();
+            SuspendLayout();
             // 
             // inputTextBox
             // 
-            this.inputTextBox.Location = new System.Drawing.Point(44, 88);
-            this.inputTextBox.Name = "inputTextBox";
-            this.inputTextBox.Size = new System.Drawing.Size(316, 27);
-            this.inputTextBox.TabIndex = 0;
-            this.inputTextBox.PlaceholderText = "请输入要模拟的键盘内容...";
+            inputTextBox.Location = new Point(44, 88);
+            inputTextBox.Name = "inputTextBox";
+            inputTextBox.PlaceholderText = "请输入要模拟的键盘内容...";
+            inputTextBox.Size = new Size(316, 27);
+            inputTextBox.TabIndex = 0;
             // 
             // simulateButton
             // 
-            this.simulateButton.Location = new System.Drawing.Point(366, 86);
-            this.simulateButton.Name = "simulateButton";
-            this.simulateButton.Size = new System.Drawing.Size(94, 29);
-            this.simulateButton.TabIndex = 1;
-            this.simulateButton.Text = "模拟输入";
-            this.simulateButton.UseVisualStyleBackColor = true;
-            this.simulateButton.Click += new System.EventHandler(this.simulateButton_Click);
+            simulateButton.Location = new Point(366, 86);
+            simulateButton.Name = "simulateButton";
+            simulateButton.Size = new Size(94, 29);
+            simulateButton.TabIndex = 1;
+            simulateButton.Text = "模拟输入";
+            simulateButton.UseVisualStyleBackColor = true;
+            simulateButton.Click += simulateButton_Click;
             // 
             // fixed123Button
             // 
-            this.fixed123Button.Location = new System.Drawing.Point(466, 86);
-            this.fixed123Button.Name = "fixed123Button";
-            this.fixed123Button.Size = new System.Drawing.Size(94, 29);
-            this.fixed123Button.TabIndex = 2;
-            this.fixed123Button.Text = "固定输入123";
-            this.fixed123Button.UseVisualStyleBackColor = true;
-            this.fixed123Button.Click += new System.EventHandler(this.fixed123Button_Click);
+            fixed123Button.Location = new Point(466, 86);
+            fixed123Button.Name = "fixed123Button";
+            fixed123Button.Size = new Size(94, 29);
+            fixed123Button.TabIndex = 2;
+            fixed123Button.Text = "固定输入123";
+            fixed123Button.UseVisualStyleBackColor = true;
+            fixed123Button.Click += fixed123Button_Click;
             // 
             // titleLabel
             // 
-            this.titleLabel.AutoSize = true;
-            this.titleLabel.Font = new System.Drawing.Font("Microsoft YaHei UI", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.titleLabel.Location = new System.Drawing.Point(44, 30);
-            this.titleLabel.Name = "titleLabel";
-            this.titleLabel.Size = new System.Drawing.Size(264, 31);
-            this.titleLabel.TabIndex = 3;
-            this.titleLabel.Text = "键盘输入模拟器工具";
+            titleLabel.AutoSize = true;
+            titleLabel.Font = new Font("Microsoft YaHei UI", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 134);
+            titleLabel.Location = new Point(44, 30);
+            titleLabel.Name = "titleLabel";
+            titleLabel.Size = new Size(221, 31);
+            titleLabel.TabIndex = 3;
+            titleLabel.Text = "键盘输入模拟器工具";
             // 
             // mouseClickButton
             // 
-            this.mouseClickButton.Location = new System.Drawing.Point(44, 121);
-            this.mouseClickButton.Name = "mouseClickButton";
-            this.mouseClickButton.Size = new System.Drawing.Size(516, 29);
-            this.mouseClickButton.TabIndex = 4;
-            this.mouseClickButton.Text = "鼠标点击模拟 (1秒3次，持续10秒)";
-            this.mouseClickButton.UseVisualStyleBackColor = true;
-            this.mouseClickButton.Click += new System.EventHandler(this.mouseClickButton_Click);
+            mouseClickButton.Location = new Point(44, 121);
+            mouseClickButton.Name = "mouseClickButton";
+            mouseClickButton.Size = new Size(516, 29);
+            mouseClickButton.TabIndex = 4;
+            mouseClickButton.Text = "鼠标点击模拟 (1秒3次，持续10秒)";
+            mouseClickButton.UseVisualStyleBackColor = true;
+            mouseClickButton.Click += mouseClickButton_Click;
             // 
-            // imageRecognitionButton - 暂时禁用图像识别功能
+            // imageRecognitionButton
             // 
-            this.imageRecognitionButton = new System.Windows.Forms.Button();
-            this.imageRecognitionButton.Location = new System.Drawing.Point(44, 156);
-            this.imageRecognitionButton.Name = "imageRecognitionButton";
-            this.imageRecognitionButton.Size = new System.Drawing.Size(516, 29);
-            this.imageRecognitionButton.TabIndex = 5;
-            this.imageRecognitionButton.Text = "识别图像并点击 (功能暂未启用)";
-            this.imageRecognitionButton.UseVisualStyleBackColor = true;
-            this.imageRecognitionButton.Enabled = false; // 暂时禁用按钮
-            // 移除事件绑定，防止意外触发
-            //this.imageRecognitionButton.Click += new System.EventHandler(this.imageRecognitionButton_Click);
+            imageRecognitionButton.Enabled = false;
+            imageRecognitionButton.Location = new Point(44, 156);
+            imageRecognitionButton.Name = "imageRecognitionButton";
+            imageRecognitionButton.Size = new Size(516, 29);
+            imageRecognitionButton.TabIndex = 5;
+            imageRecognitionButton.Text = "识别图像并点击 (功能暂未启用)";
+            imageRecognitionButton.UseVisualStyleBackColor = true;
             // 
             // settingsButton
             // 
-            this.settingsButton = new System.Windows.Forms.Button();
-            this.settingsButton.Location = new System.Drawing.Point(490, 10);
-            this.settingsButton.Name = "settingsButton";
-            this.settingsButton.Size = new System.Drawing.Size(30, 30);
-            this.settingsButton.TabIndex = 6;
-            this.settingsButton.Text = "设置";
-            this.settingsButton.UseVisualStyleBackColor = true;
-            this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click);
+            settingsButton.Location = new Point(490, 10);
+            settingsButton.Name = "settingsButton";
+            settingsButton.Size = new Size(30, 30);
+            settingsButton.TabIndex = 6;
+            settingsButton.Text = "设置";
+            settingsButton.UseVisualStyleBackColor = true;
+            settingsButton.Click += settingsButton_Click;
             // 
             // recognize003Button
             // 
-            this.recognize003Button = new System.Windows.Forms.Button();
-            this.recognize003Button.Location = new System.Drawing.Point(44, 191);
-            this.recognize003Button.Name = "recognize003Button";
-            this.recognize003Button.Size = new System.Drawing.Size(516, 29);
-            this.recognize003Button.TabIndex = 7;
-            this.recognize003Button.Text = "识别003图像并点击3次";
-            this.recognize003Button.UseVisualStyleBackColor = true;
-            this.recognize003Button.Click += new System.EventHandler(this.recognize003Button_Click);
-
+            recognize003Button.Location = new Point(44, 191);
+            recognize003Button.Name = "recognize003Button";
+            recognize003Button.Size = new Size(516, 29);
+            recognize003Button.TabIndex = 7;
+            recognize003Button.Text = "识别003图像并点击3次";
+            recognize003Button.UseVisualStyleBackColor = true;
+            recognize003Button.Click += recognize003Button_Click;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(604, 245);
-            this.Controls.Add(this.recognize003Button);
-            this.Controls.Add(this.settingsButton);
-            this.Controls.Add(this.imageRecognitionButton);
-            this.Controls.Add(this.mouseClickButton);
-            this.Controls.Add(this.titleLabel);
-            this.Controls.Add(this.fixed123Button);
-            this.Controls.Add(this.simulateButton);
-            this.Controls.Add(this.inputTextBox);
-            this.Name = "Form1";
-            this.Text = "键盘与鼠标模拟器";
-            this.Load += new System.EventHandler(this.Form1_Load);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(9F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(604, 245);
+            Controls.Add(recognize003Button);
+            Controls.Add(settingsButton);
+            Controls.Add(imageRecognitionButton);
+            Controls.Add(mouseClickButton);
+            Controls.Add(titleLabel);
+            Controls.Add(fixed123Button);
+            Controls.Add(simulateButton);
+            Controls.Add(inputTextBox);
+            Name = "Form1";
+            Text = "键盘与鼠标模拟器";
+            Load += Form1_Load;
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
