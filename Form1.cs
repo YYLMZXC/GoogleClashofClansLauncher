@@ -196,20 +196,25 @@ namespace GoogleClashofClansLauncher
             
             if (!string.IsNullOrEmpty(textToSimulate))
             {
-                // 尝试激活游戏窗口
-                IntPtr windowHandle = ActivateGameWindow();
+                // 仅获取窗口句柄而不激活窗口，避免强制游戏窗口化
+                IntPtr windowHandle = GetGameWindowHandle();
                 if (windowHandle == IntPtr.Zero)
                 {
                     // 简化提示信息
-                    Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
+                    Debug.WriteLine("未能找到部落冲突游戏窗口");
                     return;
                 }
                 
-                // 等待鼠标移动到目标窗口内
-                if (!WaitForMouseInTargetWindow(5000)) // 等待5秒
+                // 确保窗口可见但不激活
+                windowManager.RestoreWindowOnly(windowHandle);
+                
+                // 检查鼠标是否在目标窗口内（可选，根据需要启用）
+                // 注意：如果需要在后台发送输入，可能需要移除这个检查
+                if (!mouseSimulator.IsMouseInTargetWindow())
                 {
-                    Debug.WriteLine("鼠标未在游戏窗口内，操作已取消");
-                    return;
+                    Debug.WriteLine("注意：鼠标不在游戏窗口内，但仍尝试发送输入");
+                    // 如果不需要鼠标位置检查，可以注释掉下面的return语句
+                    // return;
                 }
                 
                 // 降低延迟时间，从1秒改为200毫秒
@@ -234,20 +239,24 @@ namespace GoogleClashofClansLauncher
 
         private void fixed123Button_Click(object sender, EventArgs e)
         {
-            // 尝试激活游戏窗口
-            IntPtr windowHandle = ActivateGameWindow();
+            // 仅获取窗口句柄而不激活窗口，避免强制游戏窗口化
+            IntPtr windowHandle = GetGameWindowHandle();
             if (windowHandle == IntPtr.Zero)
             {
                 // 简化提示信息
-                Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
+                Debug.WriteLine("未能找到部落冲突游戏窗口");
                 return;
             }
             
-            // 等待鼠标移动到目标窗口内
-            if (!WaitForMouseInTargetWindow(5000)) // 等待5秒
+            // 确保窗口可见但不激活
+            windowManager.RestoreWindowOnly(windowHandle);
+            
+            // 检查鼠标是否在目标窗口内（可选）
+            if (!mouseSimulator.IsMouseInTargetWindow())
             {
-                Debug.WriteLine("鼠标未在游戏窗口内，操作已取消");
-                return;
+                Debug.WriteLine("注意：鼠标不在游戏窗口内，但仍尝试发送输入");
+                // 如果不需要鼠标位置检查，可以注释掉下面的return语句
+                // return;
             }
             
             // 降低延迟时间，从1秒改为200毫秒
@@ -255,41 +264,96 @@ namespace GoogleClashofClansLauncher
             keyboardSimulator.TypeText("123");
         }
 
-        private IntPtr ActivateGameWindow()
+        /// <summary>
+        /// 仅获取游戏窗口句柄而不激活窗口
+        /// </summary>
+        /// <returns>窗口句柄，未找到返回IntPtr.Zero</returns>
+        private IntPtr GetGameWindowHandle()
         {
-            // 尝试通过进程名和窗口标题关键字查找并激活窗口
+            Debug.WriteLine("开始查找部落冲突游戏窗口...");
+            
+            // 策略1: 尝试通过进程名查找
+            Debug.WriteLine("策略1: 尝试通过进程名 '" + ProcessName + "' 查找");
             Process[] processes = Process.GetProcessesByName(ProcessName);
             
             foreach (Process process in processes)
             {
                 try
                 {
-                    // 尝试获取窗口标题
-                    if (!string.IsNullOrEmpty(process.MainWindowTitle) && 
-                        process.MainWindowTitle.Contains(WindowTitleKeyword))
+                    string windowTitle = process.MainWindowTitle;
+                    Debug.WriteLine("找到进程: '" + process.ProcessName + "', ID: " + process.Id + ", 窗口标题: '" + windowTitle + "'");
+                    
+                    // 尝试获取窗口标题，使用不区分大小写的比较
+                    if (!string.IsNullOrEmpty(windowTitle) && 
+                        windowTitle.IndexOf(WindowTitleKeyword, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        windowManager.ActivateWindow(process.MainWindowHandle);
-                        // 锁定键盘和鼠标模拟器到找到的窗口
+                        Debug.WriteLine("找到匹配的窗口");
+                        // 锁定键盘和鼠标模拟器到找到的窗口，但不激活
                         keyboardSimulator.SetTargetWindow(process.MainWindowHandle);
                         mouseSimulator.SetTargetWindow(process.MainWindowHandle);
                         return process.MainWindowHandle;
                     }
                 }
-                catch { /* 忽略访问被拒绝的异常 */ }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("访问进程时出错: " + ex.Message);
+                }
             }
             
-            // 如果通过进程名没找到，尝试通过窗口标题关键字枚举所有窗口
+            // 策略2: 通过窗口标题关键字枚举所有窗口
+            Debug.WriteLine("策略2: 尝试通过窗口标题关键字 '" + WindowTitleKeyword + "' 枚举所有窗口");
             IntPtr windowHandle = FindWindowByKeyword(WindowTitleKeyword);
             if (windowHandle != IntPtr.Zero)
             {
-                windowManager.ActivateWindow(windowHandle);
-                // 锁定键盘和鼠标模拟器到找到的窗口
+                Debug.WriteLine("通过关键字找到窗口");
+                // 锁定键盘和鼠标模拟器到找到的窗口，但不激活
                 keyboardSimulator.SetTargetWindow(windowHandle);
                 mouseSimulator.SetTargetWindow(windowHandle);
                 return windowHandle;
             }
             
+            // 策略3: 尝试查找可能的子窗口或其他相关窗口
+            Debug.WriteLine("策略3: 尝试查找可能的子窗口或其他相关窗口");
+            string[] alternativeKeywords = new string[]
+            {
+                "Clash of Clans", // 英文标题
+                "部落冲突 COC", // 可能的变体
+                "COC", // 缩写
+                "Google Play Games"
+            };
+            
+            foreach (string altKeyword in alternativeKeywords)
+            {
+                IntPtr altWindowHandle = FindWindowByKeyword(altKeyword);
+                if (altWindowHandle != IntPtr.Zero)
+                {
+                    Debug.WriteLine("通过备用关键字 '" + altKeyword + "' 找到窗口");
+                    keyboardSimulator.SetTargetWindow(altWindowHandle);
+                    mouseSimulator.SetTargetWindow(altWindowHandle);
+                    return altWindowHandle;
+                }
+            }
+            
+            Debug.WriteLine("未找到部落冲突游戏窗口");
             return IntPtr.Zero;
+        }
+        
+        /// <summary>
+        /// 激活游戏窗口（将其置于前台）
+        /// </summary>
+        /// <returns>窗口句柄，未找到返回IntPtr.Zero</returns>
+        private IntPtr ActivateGameWindow()
+        {
+            IntPtr windowHandle = GetGameWindowHandle();
+            
+            if (windowHandle != IntPtr.Zero)
+            {
+                // 只在需要时激活窗口（例如点击操作）
+                Debug.WriteLine("激活游戏窗口");
+                windowManager.ActivateWindow(windowHandle);
+            }
+            
+            return windowHandle;
         }
 
         private bool IsProcessRunning(string processName)
@@ -300,16 +364,63 @@ namespace GoogleClashofClansLauncher
         // 通过关键字模糊查找窗口
         private IntPtr FindWindowByKeyword(string keyword)
         {
+            // 先尝试完整匹配，针对部落冲突(Clash of Clans)xxx这种格式
+            IntPtr fullMatchWindow = FindWindowByFullKeyword(keyword);
+            if (fullMatchWindow != IntPtr.Zero)
+            {
+                Debug.WriteLine("找到完整匹配的窗口");
+                return fullMatchWindow;
+            }
+
+            // 如果完整匹配失败，尝试使用模糊匹配
+            Debug.WriteLine("完整匹配失败，尝试模糊匹配");
             IntPtr foundWindow = IntPtr.Zero;
             EnumWindows((hWnd, lParam) =>
             {
-                StringBuilder title = new StringBuilder(256);
+                StringBuilder title = new StringBuilder(512); // 增加缓冲区大小以处理更长的标题
                 GetWindowText(hWnd, title, title.Capacity);
+                string windowTitle = title.ToString();
                 
-                if (title.ToString().Contains(keyword))
+                // 检查窗口标题是否包含关键字，不区分大小写
+                if (!string.IsNullOrEmpty(windowTitle) && windowTitle.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
                 {
+                    Debug.WriteLine("找到匹配窗口: " + windowTitle);
                     foundWindow = hWnd;
                     return false; // 停止枚举
+                }
+                return true; // 继续枚举
+            }, IntPtr.Zero);
+            
+            return foundWindow;
+        }
+        
+        private IntPtr FindWindowByFullKeyword(string keyword)
+        {
+            IntPtr foundWindow = IntPtr.Zero;
+            // 尝试匹配包含完整部落冲突标题格式的窗口
+            string[] patterns = new string[]
+            {
+                keyword, // 直接匹配
+                $"{keyword}(Clash of Clans)", // 常见格式
+                $"{keyword}(Clash of Clans)*" // 带后缀的格式
+            };
+            
+            EnumWindows((hWnd, lParam) =>
+            {
+                StringBuilder title = new StringBuilder(512);
+                GetWindowText(hWnd, title, title.Capacity);
+                string windowTitle = title.ToString();
+                
+                foreach (string pattern in patterns)
+                {
+                    if (!string.IsNullOrEmpty(windowTitle) && 
+                        (windowTitle.Equals(pattern, StringComparison.OrdinalIgnoreCase) ||
+                         (pattern.EndsWith("*") && windowTitle.StartsWith(pattern.Substring(0, pattern.Length - 1), StringComparison.OrdinalIgnoreCase))))
+                    {
+                        Debug.WriteLine("找到符合模式的窗口: " + windowTitle);
+                        foundWindow = hWnd;
+                        return false; // 停止枚举
+                    }
                 }
                 return true; // 继续枚举
             }, IntPtr.Zero);
