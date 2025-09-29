@@ -39,14 +39,16 @@ public class ResourceManager
             {
                 return currentDir;
             }
-            
-            string parentDir = Path.GetDirectoryName(currentDir);
+
+            string? parentDir = Path.GetDirectoryName(currentDir);
             if (string.IsNullOrEmpty(parentDir))
+            {
                 break;
-            
+            }
+
             currentDir = parentDir;
         }
-        
+
         return _applicationDirectory; // 如果找不到，返回应用程序目录
     }
 

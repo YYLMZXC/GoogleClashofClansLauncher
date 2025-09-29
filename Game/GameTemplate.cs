@@ -119,7 +119,7 @@ public class GameTemplate
             }
 
             // 确保目录存在
-            string directory = Path.GetDirectoryName(TemplatePath);
+            string? directory = Path.GetDirectoryName(TemplatePath);
             if (directory == null)
             {
                 directory = Utils.GetApplicationDataDirectory();

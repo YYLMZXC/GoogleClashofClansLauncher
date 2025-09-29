@@ -147,7 +147,7 @@ public class GameWindow
                 System.Threading.Thread.Sleep(100);
             }
 
-            Utils.LogError($"等待游戏窗口超时，超过{FindWindowTimeout}毫秒", "GameWindow");
+            Utils.LogError($"等待游戏窗口超时，超过{FindWindowTimeout}毫秒", null, "GameWindow");
             return false;
         }
         catch (Exception ex)

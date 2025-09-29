@@ -24,7 +24,7 @@ public class ConfigManager
     /// </summary>
     static ConfigManager()
     {
-        string appDataDir = Utils.GetAppDataDirectory();
+        string appDataDir = Utils.GetApplicationDataDirectory();
         _configFilePath = Path.Combine(appDataDir, DEFAULT_CONFIG_FILE_NAME);
     }
 
@@ -99,8 +99,8 @@ public class ConfigManager
                 }
 
                 // 确保配置目录存在
-                string configDir = Path.GetDirectoryName(_configFilePath);
-                if (configDir != null && !Directory.Exists(configDir))
+                string? configDir = Path.GetDirectoryName(_configFilePath);
+                if (!string.IsNullOrEmpty(configDir) && !Directory.Exists(configDir))
                 {
                     Directory.CreateDirectory(configDir);
                 }

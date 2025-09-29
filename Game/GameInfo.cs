@@ -31,6 +31,8 @@ public class GameInfo
 
     private readonly WindowManager _windowManager = new WindowManager();
 
+    private readonly WindowFinder _windowFinder = new WindowFinder();
+
     // 游戏分辨率信息
     private int _preferredWidth = 1024;
     private int _preferredHeight = 768;
@@ -206,7 +208,7 @@ public class GameInfo
             _gameTemplates.Clear();
             
             // 获取模板目录
-            string templatesDir = Path.Combine(ResourceManager.Instance.GetProjectRootDirectory(), Constants.RESOURCE_TEMPLATES_FOLDER);
+            string templatesDir = new ResourceManager().GetResourcePath(Constants.RESOURCE_TEMPLATES_FOLDER);
             
             if (!Directory.Exists(templatesDir))
             {
@@ -260,15 +262,15 @@ public class GameInfo
         try
         {
             // 查找游戏窗口
-            IntPtr windowHandle = WindowFinder.FindWindowByProcessName(_gameProcessName);
-            
+            IntPtr windowHandle = _windowFinder.FindWindowByProcessName(_gameProcessName);
+
             if (windowHandle != IntPtr.Zero)
             {
                 IsGameRunning = true;
                 GameWindowHandle = windowHandle;
                 
                 // 获取窗口位置和大小
-                Rectangle windowRect = WindowFinder.GetWindowRect(windowHandle);
+                Rectangle windowRect = _windowFinder.GetWindowRect(windowHandle);
                 GameWindowRect = windowRect;
             }
             else

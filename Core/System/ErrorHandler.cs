@@ -37,7 +37,7 @@ public static class ErrorHandler
             Application.ThreadException += OnApplicationThreadException;
 
             // 设置日志文件路径
-            _logFilePath = Utils.GetAppDataFilePath("error_log.txt");
+            _logFilePath = Path.Combine(Utils.GetApplicationDataDirectory(), "error_log.txt");
             _isInitialized = true;
 
             Utils.LogDebug("错误处理器初始化成功", "ErrorHandler");

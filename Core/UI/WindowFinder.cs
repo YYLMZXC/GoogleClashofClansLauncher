@@ -122,7 +122,7 @@ public class WindowFinder
         public int Bottom;
     }
 
-    public static Rectangle GetWindowRect(IntPtr hWnd)
+    public Rectangle GetWindowRect(IntPtr hWnd)
     {
         RECT rect = new RECT();
         if (GetWindowRect(hWnd, out rect))

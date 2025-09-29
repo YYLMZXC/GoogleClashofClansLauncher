@@ -18,6 +18,7 @@ public static class Constants
     
     // 资源相关常量
     public const string ResourceDirectory = "Res";
+    public const string RESOURCE_TEMPLATES_FOLDER = "Templates";
     public const string IconDirectory = "2";
     public const string IconFileName = "002.ico";
     
@@ -41,4 +42,12 @@ public static class Constants
     // 测试相关常量
     public const int ClickTestDuration = 10; // 点击测试持续时间（秒）
     public const int ClicksPerSecond = 3; // 每秒点击次数
+    
+    public const string GITHUB_REPO_OWNER = "LazySolero";
+    public const string GITHUB_REPO_NAME = "GoogleClashofClansLauncher";
+
+    public const string ApplicationName = "GoogleClashofClansLauncher";
+
+    // Default folders
+    public const string RESOURCE_FOLDER = "Resources";
 }
