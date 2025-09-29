@@ -109,13 +109,25 @@
             this.settingsButton.Text = "设置";
             this.settingsButton.UseVisualStyleBackColor = true;
             this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click);
+            // 
+            // recognize003Button
+            // 
+            this.recognize003Button = new System.Windows.Forms.Button();
+            this.recognize003Button.Location = new System.Drawing.Point(44, 191);
+            this.recognize003Button.Name = "recognize003Button";
+            this.recognize003Button.Size = new System.Drawing.Size(516, 29);
+            this.recognize003Button.TabIndex = 7;
+            this.recognize003Button.Text = "识别003图像并点击3次";
+            this.recognize003Button.UseVisualStyleBackColor = true;
+            this.recognize003Button.Click += new System.EventHandler(this.recognize003Button_Click);
 
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(604, 220);
+            this.ClientSize = new System.Drawing.Size(604, 245);
+            this.Controls.Add(this.recognize003Button);
             this.Controls.Add(this.settingsButton);
             this.Controls.Add(this.imageRecognitionButton);
             this.Controls.Add(this.mouseClickButton);
@@ -139,6 +151,7 @@
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Button mouseClickButton;
         private System.Windows.Forms.Button imageRecognitionButton;
+        private System.Windows.Forms.Button recognize003Button;
         private System.Windows.Forms.Button settingsButton;
     }
 }

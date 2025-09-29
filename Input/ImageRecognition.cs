@@ -17,8 +17,8 @@ namespace GoogleClashofClansLauncher.Input;
 /// </summary>
 public class ImageRecognition
 {
-    // 功能控制标志 - 当前设置为false表示禁用
-    private const bool FEATURE_ENABLED = false;
+    // 功能控制标志 - 设置为true启用图像识别功能
+    private const bool FEATURE_ENABLED = true;
     
     private const int SRCCOPY = 0x00CC0020;
     private const int CAPTUREBLT = 0x40000000;
