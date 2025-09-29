@@ -86,20 +86,6 @@
             this.mouseClickButton.UseVisualStyleBackColor = true;
             this.mouseClickButton.Click += new System.EventHandler(this.mouseClickButton_Click);
             // 
-            // Form1
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(604, 175);
-            this.Controls.Add(this.mouseClickButton);
-            this.Controls.Add(this.titleLabel);
-            this.Controls.Add(this.fixed123Button);
-            this.Controls.Add(this.simulateButton);
-            this.Controls.Add(this.inputTextBox);
-            this.Name = "Form1";
-            this.Text = "键盘与鼠标模拟器";
-            this.Load += new System.EventHandler(this.Form1_Load);
-            // 
             // imageRecognitionButton - 暂时禁用图像识别功能
             // 
             this.imageRecognitionButton = new System.Windows.Forms.Button();
@@ -113,11 +99,24 @@
             // 移除事件绑定，防止意外触发
             //this.imageRecognitionButton.Click += new System.EventHandler(this.imageRecognitionButton_Click);
             // 
+            // settingsButton
+            // 
+            this.settingsButton = new System.Windows.Forms.Button();
+            this.settingsButton.Location = new System.Drawing.Point(490, 10);
+            this.settingsButton.Name = "settingsButton";
+            this.settingsButton.Size = new System.Drawing.Size(30, 30);
+            this.settingsButton.TabIndex = 6;
+            this.settingsButton.Text = "设置";
+            this.settingsButton.UseVisualStyleBackColor = true;
+            this.settingsButton.Click += new System.EventHandler(this.settingsButton_Click);
+
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(604, 220);
+            this.Controls.Add(this.settingsButton);
             this.Controls.Add(this.imageRecognitionButton);
             this.Controls.Add(this.mouseClickButton);
             this.Controls.Add(this.titleLabel);
@@ -140,5 +139,6 @@
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Button mouseClickButton;
         private System.Windows.Forms.Button imageRecognitionButton;
+        private System.Windows.Forms.Button settingsButton;
     }
 }

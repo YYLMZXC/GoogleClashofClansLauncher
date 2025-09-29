@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Drawing;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace GoogleClashofClansLauncher
 {
@@ -41,6 +43,65 @@ namespace GoogleClashofClansLauncher
             {
                 // 不再显示消息框，避免干扰用户操作
                 Debug.WriteLine("检测到Google Play Games模拟器已经在运行中。");
+            }
+            
+            // 加载设置按钮图标
+            try
+            {
+                // 使用相对路径加载Res/2文件夹下的002.ico图标
+                string appDir = Path.GetDirectoryName(Application.ExecutablePath);
+                string projectDir = appDir;
+                
+                // 尝试向上查找项目根目录，直到找到Res文件夹
+                for (int i = 0; i < 3; i++)
+                {
+                    string possibleResDir = Path.Combine(projectDir, "Res");
+                    if (Directory.Exists(possibleResDir))
+                    {
+                        break;
+                    }
+                    projectDir = Path.GetDirectoryName(projectDir);
+                    if (string.IsNullOrEmpty(projectDir)) break;
+                }
+                
+                string iconPath = Path.Combine(projectDir ?? appDir, "Res", "2", "002.ico");
+                
+                if (File.Exists(iconPath))
+                {
+                    using (Icon icon = new Icon(iconPath))
+                    {
+                        settingsButton.Image = icon.ToBitmap();
+                        settingsButton.Text = "";
+                        settingsButton.ImageAlign = ContentAlignment.MiddleCenter;
+                        Debug.WriteLine("成功加载图标: " + iconPath);
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine("图标文件不存在: " + iconPath);
+                    
+                    // 尝试备用路径
+                    string altIconPath = Path.Combine(Application.StartupPath, "Res", "2", "002.ico");
+                    if (File.Exists(altIconPath))
+                    {
+                        using (Icon icon = new Icon(altIconPath))
+                        {
+                            settingsButton.Image = icon.ToBitmap();
+                            settingsButton.Text = "";
+                            settingsButton.ImageAlign = ContentAlignment.MiddleCenter;
+                            Debug.WriteLine("使用备用路径成功加载图标: " + altIconPath);
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("备用图标路径也不存在: " + altIconPath);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("加载图标时发生错误: " + ex.Message);
+                Debug.WriteLine("异常详细信息: " + ex.StackTrace);
             }
         }
 
@@ -275,6 +336,24 @@ namespace GoogleClashofClansLauncher
                 Debug.WriteLine("按钮点击处理异常: " + ex.Message);
                 imageRecognitionButton.Text = "识别图像并点击 (res/1/001.png)";
                 imageRecognitionButton.Enabled = true;
+            }
+        }
+
+        /// <summary>
+        /// 设置按钮点击事件
+        /// 打开设置界面
+        /// </summary>
+        private void settingsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // 创建并显示设置界面
+                SettingsForm settingsForm = new SettingsForm();
+                settingsForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("打开设置界面时发生错误: " + ex.Message);
             }
         }
 
