@@ -3,6 +3,7 @@ using GoogleClashofClansLauncher.Core;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
@@ -12,6 +13,8 @@ namespace GoogleClashofClansLauncher
     {
         private KeyboardSimulator keyboardSimulator;
         private WindowManager windowManager;
+        private MouseSimulator mouseSimulator;
+        private CancellationTokenSource? cancellationTokenSource;
 
         // 进程名称和窗口标题关键字
         private const string ProcessName = "crosvm";
@@ -22,6 +25,8 @@ namespace GoogleClashofClansLauncher
             InitializeComponent();
             keyboardSimulator = new KeyboardSimulator();
             windowManager = new WindowManager();
+            mouseSimulator = new MouseSimulator();
+            cancellationTokenSource = null;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -122,6 +127,78 @@ namespace GoogleClashofClansLauncher
             }, IntPtr.Zero);
             
             return foundWindow;
+        }
+
+        /// <summary>
+        /// 鼠标点击模拟按钮点击事件
+        /// 实现1秒点击3次，持续10秒的功能
+        /// 使用后台线程执行以避免UI冻结
+        /// </summary>
+        private void mouseClickButton_Click(object sender, EventArgs e)
+        {
+            // 如果已经有模拟在运行，先取消
+            if (cancellationTokenSource != null && !cancellationTokenSource.IsCancellationRequested)
+            {
+                cancellationTokenSource.Cancel();
+                mouseClickButton.Text = "开始鼠标点击模拟 (1秒3次，持续10秒)";
+                Debug.WriteLine("鼠标点击模拟已取消");
+                return;
+            }
+
+            // 尝试激活游戏窗口
+            if (!ActivateGameWindow())
+            {
+                Debug.WriteLine("未能找到或激活部落冲突游戏窗口");
+                return;
+            }
+
+            // 更新按钮文本
+            mouseClickButton.Text = "停止鼠标点击模拟";
+            Debug.WriteLine("开始鼠标点击模拟");
+
+            // 创建新的取消令牌
+            cancellationTokenSource = new CancellationTokenSource();
+            CancellationToken token = cancellationTokenSource.Token;
+
+            // 在后台线程中执行鼠标点击模拟
+            Task.Run(() =>
+            {
+                try
+                {
+                    // 初始延迟
+                    Thread.Sleep(200);
+
+                    // 记录开始时间
+                    DateTime startTime = DateTime.Now;
+                    // 持续10秒或直到取消
+                    while ((DateTime.Now - startTime).TotalSeconds < 10 && !token.IsCancellationRequested)
+                    {
+                        // 1秒内点击3次（间隔约333毫秒）
+                        for (int i = 0; i < 3; i++)
+                        {
+                            if (token.IsCancellationRequested) break;
+                            mouseSimulator.LeftClick();
+                            // 约333毫秒的间隔
+                            Thread.Sleep(333);
+                        }
+                    }
+
+                    // 确保UI线程中更新按钮文本
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        mouseClickButton.Text = "鼠标点击模拟 (1秒3次，持续10秒)";
+                    });
+
+                    if (!token.IsCancellationRequested)
+                    {
+                        Debug.WriteLine("鼠标点击模拟完成");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("鼠标点击模拟发生错误: " + ex.Message);
+                }
+            }, token);
         }
 
         // Win32 API声明

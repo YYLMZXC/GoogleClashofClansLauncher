@@ -34,6 +34,10 @@
             this.titleLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
+            // mouseClickButton
+            // 
+            this.mouseClickButton = new System.Windows.Forms.Button();
+            // 
             // inputTextBox
             // 
             this.inputTextBox.Location = new System.Drawing.Point(44, 88);
@@ -72,17 +76,28 @@
             this.titleLabel.TabIndex = 3;
             this.titleLabel.Text = "键盘输入模拟器工具";
             // 
+            // mouseClickButton
+            // 
+            this.mouseClickButton.Location = new System.Drawing.Point(44, 121);
+            this.mouseClickButton.Name = "mouseClickButton";
+            this.mouseClickButton.Size = new System.Drawing.Size(516, 29);
+            this.mouseClickButton.TabIndex = 4;
+            this.mouseClickButton.Text = "鼠标点击模拟 (1秒3次，持续10秒)";
+            this.mouseClickButton.UseVisualStyleBackColor = true;
+            this.mouseClickButton.Click += new System.EventHandler(this.mouseClickButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(604, 151);
+            this.ClientSize = new System.Drawing.Size(604, 175);
+            this.Controls.Add(this.mouseClickButton);
             this.Controls.Add(this.titleLabel);
             this.Controls.Add(this.fixed123Button);
             this.Controls.Add(this.simulateButton);
             this.Controls.Add(this.inputTextBox);
             this.Name = "Form1";
-            this.Text = "键盘模拟器";
+            this.Text = "键盘与鼠标模拟器";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -95,5 +110,6 @@
         private System.Windows.Forms.Button simulateButton;
         private System.Windows.Forms.Button fixed123Button;
         private System.Windows.Forms.Label titleLabel;
+        private System.Windows.Forms.Button mouseClickButton;
     }
 }
