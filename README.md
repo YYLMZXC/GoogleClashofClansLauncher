@@ -1,4 +1,6 @@
-# Google Clash of Clans Launcher
+# Google Clash of Clans 启动器
+
+![Google Play Games图标](Res/Icon_1.png) ![Clash of Clans游戏图标](Res/1.jpg)
 
 这是一个基于Windows Forms的Google Clash of Clans启动器，具有图形化界面和键盘输入模拟功能。
 
@@ -21,8 +23,18 @@ GoogleClashofClansLauncher/
 │   ├── InputSimulator.cs  # 输入模拟基础功能
 │   ├── KeyboardSimulator.cs  # 键盘输入模拟
 │   └── MouseSimulator.cs  # 鼠标输入模拟
+├── Res/
+│   ├── 1/
+│   │   └── 001.png        # 图像识别用的目标图像
+│   ├── 1.jpg              # Clash of Clans游戏图标
+│   ├── 2/
+│   │   ├── 002.ico        # 设置按钮图标
+│   │   └── 002.png        # 设置按钮图标(PNG格式)
+│   └── Icon_1.png         # Google Play Games图标
 ├── Form1.cs              # 主窗口实现
 ├── Form1.Designer.cs     # 窗口设计器代码
+├── SettingsForm.cs       # 设置窗口实现
+├── SettingsForm.Designer.cs  # 设置窗口设计器代码
 ├── Program.cs            # 应用程序入口
 └── GoogleClashofClansLauncher.csproj  # 项目配置文件
 ```
