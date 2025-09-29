@@ -45,6 +45,12 @@ namespace GoogleClashofClansLauncher
             // 初始化配置文件路径
             configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "appsettings.json");
             
+            // 初始化按钮状态
+            editApiButton.Enabled = false;
+            deleteApiButton.Enabled = false;
+            customApiNameTextBox.Enabled = false;
+            apiTypeLabel.Text = "";
+            
             // 添加预定义的AI API接口
             AddPredefinedApis();
             // 加载保存的设置
@@ -252,13 +258,26 @@ namespace GoogleClashofClansLauncher
                     ApiInfo apiInfo = apiConfigurations[selectedApi];
                     apiEndpointTextBox.Text = apiInfo.Endpoint;
                     apiKeyTextBox.Text = apiInfo.Key;
+                    apiTypeLabel.Text = "官方API";
+                    apiTypeLabel.ForeColor = Color.Green;
+                    // 预定义API不能编辑和删除
+                    editApiButton.Enabled = false;
+                    deleteApiButton.Enabled = false;
+                    customApiNameTextBox.Text = selectedApi;
+                    customApiNameTextBox.Enabled = false;
                 }
-                else
+                else if (customApis.Contains(selectedApi))
                 {
                     // 对于自定义API，我们只保存了名称，用户需要重新输入地址和密钥
-                    // 这里可以考虑进一步扩展，保存自定义API的完整配置
                     apiEndpointTextBox.Text = "";
                     apiKeyTextBox.Text = "";
+                    apiTypeLabel.Text = "自定义API";
+                    apiTypeLabel.ForeColor = Color.Blue;
+                    // 自定义API可以编辑和删除
+                    editApiButton.Enabled = true;
+                    deleteApiButton.Enabled = true;
+                    customApiNameTextBox.Text = selectedApi;
+                    customApiNameTextBox.Enabled = true;
                 }
             }
         }
@@ -296,6 +315,99 @@ namespace GoogleClashofClansLauncher
             customApiNameTextBox.Text = "";
             
             statusLabel.Text = "自定义API已添加";
+        }
+
+        private void editApiButton_Click(object sender, EventArgs e)
+        {
+            if (apiComboBox.SelectedIndex >= 0)
+            {
+                string selectedApi = apiComboBox.SelectedItem.ToString();
+                
+                // 只允许编辑自定义API
+                if (customApis.Contains(selectedApi))
+                {
+                    string newApiName = customApiNameTextBox.Text.Trim();
+                    
+                    if (string.IsNullOrEmpty(newApiName))
+                    {
+                        statusLabel.Text = "请输入新的API名称";
+                        return;
+                    }
+
+                    // 检查新名称是否已存在
+                    if ((newApiName != selectedApi) && 
+                        (apiConfigurations.ContainsKey(newApiName) || customApis.Contains(newApiName)))
+                    {
+                        statusLabel.Text = "该API名称已存在";
+                        return;
+                    }
+
+                    // 更新自定义API名称
+                    int index = customApis.IndexOf(selectedApi);
+                    if (index >= 0)
+                    {
+                        customApis[index] = newApiName;
+                    }
+                    
+                    // 刷新ComboBox
+                    LoadApiComboBox();
+                    
+                    // 选择重命名后的API
+                    int newIndex = apiComboBox.FindStringExact(newApiName);
+                    if (newIndex >= 0)
+                    {
+                        apiComboBox.SelectedIndex = newIndex;
+                    }
+                    
+                    statusLabel.Text = "自定义API已重命名";
+                }
+            }
+        }
+
+        private void deleteApiButton_Click(object sender, EventArgs e)
+        {
+            if (apiComboBox.SelectedIndex >= 0)
+            {
+                string selectedApi = apiComboBox.SelectedItem.ToString();
+                
+                // 只允许删除自定义API
+                if (customApis.Contains(selectedApi))
+                {
+                    // 显示确认对话框
+                    DialogResult result = MessageBox.Show(
+                        $"确定要删除自定义API '{selectedApi}' 吗？", 
+                        "确认删除", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Warning);
+                    
+                    if (result == DialogResult.Yes)
+                    {
+                        // 从列表中移除自定义API
+                        customApis.Remove(selectedApi);
+                        
+                        // 刷新ComboBox
+                        LoadApiComboBox();
+                        
+                        // 如果ComboBox还有项，选择第一项
+                        if (apiComboBox.Items.Count > 0)
+                        {
+                            apiComboBox.SelectedIndex = 0;
+                        }
+                        else
+                        {
+                            // 清空输入框
+                            apiEndpointTextBox.Text = "";
+                            apiKeyTextBox.Text = "";
+                            customApiNameTextBox.Text = "";
+                            apiTypeLabel.Text = "";
+                            editApiButton.Enabled = false;
+                            deleteApiButton.Enabled = false;
+                        }
+                        
+                        statusLabel.Text = "自定义API已删除";
+                    }
+                }
+            }
         }
 
         // 已移除识别设置图像的功能和相关窗口操作代码

@@ -35,6 +35,9 @@ namespace GoogleClashofClansLauncher
             this.apiSettingsTabControl = new System.Windows.Forms.TabControl();
             this.apiSettingsTabPage = new System.Windows.Forms.TabPage();
             this.apiSettingsGroupBox = new System.Windows.Forms.GroupBox();
+            this.deleteApiButton = new System.Windows.Forms.Button();
+            this.editApiButton = new System.Windows.Forms.Button();
+            this.apiTypeLabel = new System.Windows.Forms.Label();
             this.saveSettingsButton = new System.Windows.Forms.Button();
             this.customApiNameTextBox = new System.Windows.Forms.TextBox();
             this.customApiNameLabel = new System.Windows.Forms.Label();
@@ -120,6 +123,9 @@ namespace GoogleClashofClansLauncher
             this.apiSettingsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.apiSettingsGroupBox.Controls.Add(this.deleteApiButton);
+            this.apiSettingsGroupBox.Controls.Add(this.editApiButton);
+            this.apiSettingsGroupBox.Controls.Add(this.apiTypeLabel);
             this.apiSettingsGroupBox.Controls.Add(this.saveSettingsButton);
             this.apiSettingsGroupBox.Controls.Add(this.customApiNameTextBox);
             this.apiSettingsGroupBox.Controls.Add(this.customApiNameLabel);
@@ -154,6 +160,49 @@ namespace GoogleClashofClansLauncher
             this.saveSettingsButton.Text = "保存设置";
             this.saveSettingsButton.UseVisualStyleBackColor = false;
             this.saveSettingsButton.Click += new System.EventHandler(this.saveSettingsButton_Click);
+            // 
+            // apiTypeLabel
+            // 
+            this.apiTypeLabel.AutoSize = true;
+            this.apiTypeLabel.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.apiTypeLabel.ForeColor = System.Drawing.Color.Green;
+            this.apiTypeLabel.Location = new System.Drawing.Point(480, 23);
+            this.apiTypeLabel.Name = "apiTypeLabel";
+            this.apiTypeLabel.Size = new System.Drawing.Size(93, 20);
+            this.apiTypeLabel.TabIndex = 11;
+            this.apiTypeLabel.Text = "官方API";
+            // 
+            // editApiButton
+            // 
+            this.editApiButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.editApiButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(215)))), ((int)(((byte)(0)))));
+            this.editApiButton.FlatAppearance.BorderSize = 0;
+            this.editApiButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.editApiButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.editApiButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.editApiButton.Location = new System.Drawing.Point(480, 170);
+            this.editApiButton.Name = "editApiButton";
+            this.editApiButton.Size = new System.Drawing.Size(100, 28);
+            this.editApiButton.TabIndex = 7;
+            this.editApiButton.Text = "编辑API";
+            this.editApiButton.UseVisualStyleBackColor = false;
+            this.editApiButton.Click += new System.EventHandler(this.editApiButton_Click);
+            // 
+            // deleteApiButton
+            // 
+            this.deleteApiButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.deleteApiButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(105)))), ((int)(((byte)(180)))));
+            this.deleteApiButton.FlatAppearance.BorderSize = 0;
+            this.deleteApiButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.deleteApiButton.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.deleteApiButton.ForeColor = System.Drawing.Color.White;
+            this.deleteApiButton.Location = new System.Drawing.Point(480, 200);
+            this.deleteApiButton.Name = "deleteApiButton";
+            this.deleteApiButton.Size = new System.Drawing.Size(100, 28);
+            this.deleteApiButton.TabIndex = 6;
+            this.deleteApiButton.Text = "删除API";
+            this.deleteApiButton.UseVisualStyleBackColor = false;
+            this.deleteApiButton.Click += new System.EventHandler(this.deleteApiButton_Click);
             // 
             // customApiNameTextBox
             // 
@@ -380,6 +429,9 @@ namespace GoogleClashofClansLauncher
         private System.Windows.Forms.Button addCustomApiButton;
         private System.Windows.Forms.TextBox customApiNameTextBox;
         private System.Windows.Forms.Label customApiNameLabel;
+        private System.Windows.Forms.Label apiTypeLabel;
+        private System.Windows.Forms.Button editApiButton;
+        private System.Windows.Forms.Button deleteApiButton;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.TabControl apiSettingsTabControl;
         private System.Windows.Forms.TabPage apiSettingsTabPage;
