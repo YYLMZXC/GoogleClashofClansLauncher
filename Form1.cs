@@ -16,6 +16,7 @@ namespace GoogleClashofClansLauncher
         private WindowManager windowManager;
         private MouseSimulator mouseSimulator;
         private CancellationTokenSource? cancellationTokenSource;
+        // 【注意】：图像识别功能暂时禁用
         private ImageRecognition imageRecognition;
 
         // 进程名称和窗口标题关键字
@@ -28,6 +29,7 @@ namespace GoogleClashofClansLauncher
             keyboardSimulator = new KeyboardSimulator();
             windowManager = new WindowManager();
             mouseSimulator = new MouseSimulator();
+            // 【注意】：图像识别功能暂时禁用，但仍初始化实例以避免空引用异常
             imageRecognition = new ImageRecognition();
             cancellationTokenSource = null;
         }
@@ -232,8 +234,9 @@ namespace GoogleClashofClansLauncher
                         // 等待窗口激活
                         Thread.Sleep(200);
 
-                        // 调用图像识别并点击功能
-                        bool success = imageRecognition.RecognizeAndClickResImage("001", "1");
+                        // 调用图像识别并点击功能，如果识别失败则使用固定位置作为备选方案
+                        // 参数说明：图像名称，子文件夹，X轴偏移量，Y轴偏移量
+                        bool success = imageRecognition.RecognizeAndClickWithFallback("001", "1", 100, 100);
 
                         // 更新UI状态
                         this.Invoke((MethodInvoker)delegate

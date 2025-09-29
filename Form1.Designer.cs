@@ -100,16 +100,18 @@
             this.Text = "键盘与鼠标模拟器";
             this.Load += new System.EventHandler(this.Form1_Load);
             // 
-            // imageRecognitionButton
+            // imageRecognitionButton - 暂时禁用图像识别功能
             // 
             this.imageRecognitionButton = new System.Windows.Forms.Button();
             this.imageRecognitionButton.Location = new System.Drawing.Point(44, 156);
             this.imageRecognitionButton.Name = "imageRecognitionButton";
             this.imageRecognitionButton.Size = new System.Drawing.Size(516, 29);
             this.imageRecognitionButton.TabIndex = 5;
-            this.imageRecognitionButton.Text = "识别图像并点击 (res/1/001.png)";
+            this.imageRecognitionButton.Text = "识别图像并点击 (功能暂未启用)";
             this.imageRecognitionButton.UseVisualStyleBackColor = true;
-            this.imageRecognitionButton.Click += new System.EventHandler(this.imageRecognitionButton_Click);
+            this.imageRecognitionButton.Enabled = false; // 暂时禁用按钮
+            // 移除事件绑定，防止意外触发
+            //this.imageRecognitionButton.Click += new System.EventHandler(this.imageRecognitionButton_Click);
             // 
             // Form1
             // 

@@ -6,15 +6,20 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Diagnostics;
 using GoogleClashofClansLauncher.Core;
+using System.Windows.Forms; // 添加这个引用以便使用Screen类
 
 namespace GoogleClashofClansLauncher.Input;
 
 /// <summary>
 /// 图像识别工具类
 /// 用于在屏幕上查找指定模板图像并点击对应位置
+/// 【注意】：当前功能暂时禁用
 /// </summary>
 public class ImageRecognition
 {
+    // 功能控制标志 - 当前设置为false表示禁用
+    private const bool FEATURE_ENABLED = false;
+    
     private const int SRCCOPY = 0x00CC0020;
     private const int CAPTUREBLT = 0x40000000;
     private MouseSimulator mouseSimulator;
@@ -116,13 +121,21 @@ public class ImageRecognition
     }
 
     /// <summary>
-    /// 在屏幕上查找模板图像
+    /// 找到图像中心位置
+    /// 【注意】：当前功能暂时禁用
     /// </summary>
     /// <param name="templatePath">模板图像路径</param>
     /// <param name="threshold">匹配阈值 (0-1)</param>
     /// <returns>找到的图像中心位置，如果未找到则返回Point.Empty</returns>
     public Point FindImageOnScreen(string templatePath, double threshold = 0.8)
     {
+        // 如果功能被禁用，直接返回未找到
+        if (!FEATURE_ENABLED)
+        {
+            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
+            return Point.Empty;
+        }
+        
         Bitmap template = LoadTemplateImage(templatePath);
         if (template == null)
             return Point.Empty;
@@ -209,11 +222,19 @@ public class ImageRecognition
 
     /// <summary>
     /// 识别图像并点击对应位置
+    /// 【注意】：当前功能暂时禁用
     /// </summary>
     /// <param name="templatePath">模板图像路径</param>
     /// <returns>是否成功识别并点击</returns>
     public bool RecognizeAndClickImage(string templatePath)
     {
+        // 如果功能被禁用，直接返回失败
+        if (!FEATURE_ENABLED)
+        {
+            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
+            return false;
+        }
+        
         try
         {
             // 查找图像
@@ -250,12 +271,20 @@ public class ImageRecognition
 
     /// <summary>
     /// 识别并点击Res文件夹下的图片
+    /// 【注意】：当前功能暂时禁用
     /// </summary>
     /// <param name="imageName">图片名称（不含扩展名）</param>
     /// <param name="subFolder">子文件夹名称</param>
     /// <returns>是否成功识别并点击</returns>
     public bool RecognizeAndClickResImage(string imageName, string subFolder = "1")
     {
+        // 如果功能被禁用，直接返回失败
+        if (!FEATURE_ENABLED)
+        {
+            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
+            return false;
+        }
+        
         // 构建图像路径
         string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
         string imagePath = Path.Combine(appDirectory, "..", "..", "..", "Res", subFolder, $"{imageName}.png");
@@ -263,5 +292,90 @@ public class ImageRecognition
 
         Debug.WriteLine("正在查找图像: " + imagePath);
         return RecognizeAndClickImage(imagePath);
+    }
+
+    /// <summary>
+    /// 点击固定位置（左下角）
+    /// 【注意】：当前功能暂时禁用
+    /// </summary>
+    /// <param name="offsetX">X轴偏移量（相对于左下角）</param>
+    /// <param name="offsetY">Y轴偏移量（相对于左下角）</param>
+    /// <returns>是否成功执行点击</returns>
+    public bool ClickFixedPosition(int offsetX = 100, int offsetY = 100)
+    {
+        // 如果功能被禁用，直接返回失败
+        if (!FEATURE_ENABLED)
+        {
+            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
+            return false;
+        }
+        
+        try
+        {
+            // 获取主屏幕的尺寸
+            Screen primaryScreen = Screen.PrimaryScreen;
+            int screenWidth = primaryScreen.Bounds.Width;
+            int screenHeight = primaryScreen.Bounds.Height;
+
+            // 计算目标位置（左下角加上偏移量）
+            int targetX = offsetX; // 从左边缘开始的X坐标
+            int targetY = screenHeight - offsetY; // 从下边缘开始的Y坐标
+
+            Debug.WriteLine("正在点击固定位置: X=" + targetX + ", Y=" + targetY);
+
+            // 移动鼠标到目标位置
+            mouseSimulator.Move(targetX, targetY);
+            Thread.Sleep(100); // 等待鼠标移动到位
+
+            // 点击一次
+            mouseSimulator.LeftClick();
+            Debug.WriteLine("已点击固定位置");
+
+            // 再点击一次
+            Thread.Sleep(100);
+            mouseSimulator.LeftClick();
+            Debug.WriteLine("已再次点击固定位置");
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("点击固定位置过程中发生错误: " + ex.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 识别图像并点击，如果识别失败则点击固定位置
+    /// 【注意】：当前功能暂时禁用
+    /// </summary>
+    /// <param name="imageName">图片名称（不含扩展名）</param>
+    /// <param name="subFolder">子文件夹名称</param>
+    /// <param name="offsetX">X轴偏移量（相对于左下角）</param>
+    /// <param name="offsetY">Y轴偏移量（相对于左下角）</param>
+    /// <returns>是否成功执行点击</returns>
+    public bool RecognizeAndClickWithFallback(string imageName, string subFolder = "1", int offsetX = 100, int offsetY = 100)
+    {
+        // 如果功能被禁用，直接返回失败
+        if (!FEATURE_ENABLED)
+        {
+            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
+            return false;
+        }
+        
+        // 首先尝试图像识别
+        bool imageRecognized = RecognizeAndClickResImage(imageName, subFolder);
+        
+        if (imageRecognized)
+        {
+            Debug.WriteLine("图像识别成功，已点击对应位置");
+            return true;
+        }
+        else
+        {
+            // 图像识别失败，使用固定位置点击作为备选方案
+            Debug.WriteLine("图像识别失败，尝试点击固定位置");
+            return ClickFixedPosition(offsetX, offsetY);
+        }
     }
 }
