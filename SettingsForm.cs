@@ -284,6 +284,15 @@ namespace GoogleClashofClansLauncher
 
         private void addCustomApiButton_Click(object sender, EventArgs e)
         {
+            // 如果输入框是禁用的，先启用它
+            if (!customApiNameTextBox.Enabled)
+            {
+                customApiNameTextBox.Enabled = true;
+                customApiNameTextBox.Focus();
+                statusLabel.Text = "请输入自定义API名称";
+                return;
+            }
+            
             string customApiName = customApiNameTextBox.Text.Trim();
             
             if (string.IsNullOrEmpty(customApiName))
