@@ -1,188 +1,75 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Windows.Forms;
 
-namespace GoogleClashofClansLauncher.Input;
-
-/// <summary>
-/// 鼠标模拟器类
-/// 用于模拟鼠标操作
-/// </summary>
-public class MouseSimulator
+namespace GoogleClashofClansLauncher.Input
 {
-    private IntPtr targetWindow = IntPtr.Zero;
-
     /// <summary>
-    /// 设置目标窗口句柄
+    /// 最小化鼠标模拟器：仅提供移动、左/右/中键单击、简单点击测试。
     /// </summary>
-    /// <param name="windowHandle">窗口句柄</param>
-    public void SetTargetWindow(IntPtr windowHandle)
+    public sealed class MouseSimulator : IDisposable
     {
-        targetWindow = windowHandle;
-    }
-    // Windows API：鼠标事件
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, IntPtr dwExtraInfo);
+        #region Win32
+        [DllImport("user32.dll")]
+        private static extern void mouse_event(uint flags, uint dx, uint dy, uint data, IntPtr extra);
 
-    // 鼠标事件标志
-    private const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
-    private const uint MOUSEEVENTF_LEFTUP = 0x0004;
-    private const uint MOUSEEVENTF_RIGHTDOWN = 0x0008;
-    private const uint MOUSEEVENTF_RIGHTUP = 0x0010;
-    private const uint MOUSEEVENTF_MIDDLEDOWN = 0x0020;
-    private const uint MOUSEEVENTF_MIDDLEUP = 0x0040;
-    private const uint MOUSEEVENTF_MOVE = 0x0001;
-    private const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
+        [DllImport("user32.dll")]
+        private static extern bool SetCursorPos(int x, int y);
 
-    // Windows API：设置鼠标位置
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool SetCursorPos(int X, int Y);
+        private const uint MOVE = 0x0001;
+        private const uint LEFTDOWN = 0x0002;
+        private const uint LEFTUP = 0x0004;
+        private const uint RIGHTDOWN = 0x0008;
+        private const uint RIGHTUP = 0x0010;
+        private const uint MIDDLEDOWN = 0x0020;
+        private const uint MIDDLEUP = 0x0040;
+        #endregion
 
-    /// <summary>
-    /// 移动鼠标到指定位置
-    /// </summary>
-    /// <param name="x">X坐标</param>
-    /// <param name="y">Y坐标</param>
-    public void MoveMouse(int x, int y)
-    {
-        SetCursorPos(x, y);
-    }
+        /// <summary>移动鼠标到屏幕坐标</summary>
+        public void Move(int x, int y) => SetCursorPos(x, y);
 
-    /// <summary>
-    /// 模拟左键单击
-    /// </summary>
-    public void LeftClick()
-    {
-        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, IntPtr.Zero);
-        System.Threading.Thread.Sleep(50);
-        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, IntPtr.Zero);
-    }
-
-    /// <summary>
-    /// 模拟右键单击
-    /// </summary>
-    public void RightClick()
-    {
-        mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, IntPtr.Zero);
-        System.Threading.Thread.Sleep(50);
-        mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, IntPtr.Zero);
-    }
-
-    /// <summary>
-    /// 模拟中键单击
-    /// </summary>
-    public void MiddleClick()
-    {
-        mouse_event(MOUSEEVENTF_MIDDLEDOWN, 0, 0, 0, IntPtr.Zero);
-        System.Threading.Thread.Sleep(50);
-        mouse_event(MOUSEEVENTF_MIDDLEUP, 0, 0, 0, IntPtr.Zero);
-    }
-
-    /// <summary>
-    /// 检查鼠标是否在目标窗口内
-    /// </summary>
-    /// <returns>鼠标是否在目标窗口内</returns>
-    public bool IsMouseInTargetWindow()
-    {
-        if (targetWindow == IntPtr.Zero)
-            return false;
-
-        // 获取鼠标当前位置
-        if (!GetCursorPos(out POINT cursorPos))
-            return false;
-
-        // 获取窗口位置和大小
-        if (!GetWindowRect(targetWindow, out RECT windowRect))
-            return false;
-
-        // 检查鼠标位置是否在窗口矩形内
-        return cursorPos.X >= windowRect.Left && cursorPos.X <= windowRect.Right &&
-               cursorPos.Y >= windowRect.Top && cursorPos.Y <= windowRect.Bottom;
-    }
-
-    /// <summary>
-    /// 移动鼠标到指定位置（与MoveMouse功能相同，为兼容现有代码）
-    /// </summary>
-    /// <param name="x">X坐标</param>
-    /// <param name="y">Y坐标</param>
-    public void Move(int x, int y)
-    {
-        MoveMouse(x, y);
-    }
-
-    // Windows API：获取鼠标位置
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool GetCursorPos(out POINT lpPoint);
-
-    // Windows API：获取窗口矩形
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
-
-    // 点结构
-    [StructLayout(LayoutKind.Sequential)]
-    private struct POINT
-    {
-        public int X;
-        public int Y;
-    }
-
-    // 矩形结构
-    [StructLayout(LayoutKind.Sequential)]
-    private struct RECT
-    {
-        public int Left;
-        public int Top;
-        public int Right;
-        public int Bottom;
-    }
-
-    /// <summary>
-    /// 移动鼠标到指定位置并点击
-    /// </summary>
-    /// <param name="x">X坐标</param>
-    /// <param name="y">Y坐标</param>
-    public void MoveAndClick(int x, int y)
-    {
-        SetCursorPos(x, y);
-        System.Threading.Thread.Sleep(100);
-        LeftClick();
-    }
-
-    /// <summary>
-    /// 执行点击测试
-    /// </summary>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <param name="progressCallback">进度回调函数</param>
-    public void ExecuteClickTest(CancellationToken cancellationToken, Action<int>? progressCallback = null)
-    {
-        int clickCount = 0;
-        try
+        /// <summary>左键单击一次</summary>
+        public void LeftClick()
         {
-            // 示例实现：连续点击5次，每次间隔1秒
-            for (int i = 0; i < 5; i++)
+            mouse_event(LEFTDOWN, 0, 0, 0, IntPtr.Zero);
+            Thread.Sleep(20);
+            mouse_event(LEFTUP, 0, 0, 0, IntPtr.Zero);
+        }
+
+        /// <summary>右键单击一次</summary>
+        public void RightClick()
+        {
+            mouse_event(RIGHTDOWN, 0, 0, 0, IntPtr.Zero);
+            Thread.Sleep(20);
+            mouse_event(RIGHTUP, 0, 0, 0, IntPtr.Zero);
+        }
+
+        /// <summary>中键单击一次</summary>
+        public void MiddleClick()
+        {
+            mouse_event(MIDDLEDOWN, 0, 0, 0, IntPtr.Zero);
+            Thread.Sleep(20);
+            mouse_event(MIDDLEUP, 0, 0, 0, IntPtr.Zero);
+        }
+
+        /// <summary>
+        /// 简单点击测试：在屏幕中心连续左键点击 30 次（3 次/秒，共 10 秒）。
+        /// 可通过 cancellationToken 提前退出。
+        /// </summary>
+        public void ClickTest(CancellationToken token = default)
+        {
+            var (cX, cY) = (SystemInformation.PrimaryMonitorSize.Width / 2,
+                            SystemInformation.PrimaryMonitorSize.Height / 2);
+            Move(cX, cY);
+
+            for (int i = 0; i < 30 && !token.IsCancellationRequested; i++)
             {
-                // 检查是否已取消操作
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return;
-                }
-
-                // 执行点击
                 LeftClick();
-                clickCount++;
-
-                // 调用进度回调
-                if (progressCallback != null)
-                {
-                    progressCallback(clickCount);
-                }
-
-                // 等待下一次点击
-                System.Threading.Thread.Sleep(1000);
+                Thread.Sleep(330); // ≈ 3 次/秒
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine("点击测试执行过程中发生错误: " + ex.Message);
-        }
+
+        public void Dispose() { /* 暂无非托管资源 */ }
     }
 }
