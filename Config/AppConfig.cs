@@ -1,4 +1,4 @@
-using System;
+
 using System.IO;
 using System.Text.Json;
 
@@ -13,11 +13,10 @@ public static class ConfigManager
         FILE_NAME);
 
     private static AppConfig? _cfg;
-
     public static AppConfig GetConfig()
     {
         if (_cfg == null) Load();
-        return _cfg ??= CreateDefault();
+        return _cfg ??= new AppConfig();
     }
 
     public static void Save()
@@ -27,7 +26,7 @@ public static class ConfigManager
             Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
             File.WriteAllText(_path, JsonSerializer.Serialize(_cfg, new JsonSerializerOptions { WriteIndented = true }));
         }
-        catch { /* 静默 */ }
+        catch { /* silent */ }
     }
 
     private static void Load()
@@ -37,13 +36,9 @@ public static class ConfigManager
             if (File.Exists(_path))
                 _cfg = JsonSerializer.Deserialize<AppConfig>(File.ReadAllText(_path));
         }
-        catch { /* 静默 */ }
+        catch { /* silent */ }
     }
-
-    private static AppConfig CreateDefault() => new();
 }
-
-// ---------- 配置模型 ----------
 
 public class AppConfig
 {
