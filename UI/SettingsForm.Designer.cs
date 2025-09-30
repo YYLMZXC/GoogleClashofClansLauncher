@@ -159,7 +159,7 @@ namespace GoogleClashofClansLauncher.UI
             this.saveSettingsButton.TabIndex = 9;
             this.saveSettingsButton.Text = "保存设置";
             this.saveSettingsButton.UseVisualStyleBackColor = false;
-            this.saveSettingsButton.Click += new System.EventHandler(this.saveSettingsButton_Click);
+            this.saveSettingsButton.Click += new System.EventHandler(this.SaveSettingsButton_Click);
             // 
             // apiTypeLabel
             // 
@@ -186,7 +186,7 @@ namespace GoogleClashofClansLauncher.UI
             this.editApiButton.TabIndex = 7;
             this.editApiButton.Text = "编辑API";
             this.editApiButton.UseVisualStyleBackColor = false;
-            this.editApiButton.Click += new System.EventHandler(this.editApiButton_Click);
+            this.editApiButton.Click += new System.EventHandler(this.EditApiButton_Click);
             // 
             // deleteApiButton
             // 
@@ -202,7 +202,7 @@ namespace GoogleClashofClansLauncher.UI
             this.deleteApiButton.TabIndex = 6;
             this.deleteApiButton.Text = "删除API";
             this.deleteApiButton.UseVisualStyleBackColor = false;
-            this.deleteApiButton.Click += new System.EventHandler(this.deleteApiButton_Click);
+            this.deleteApiButton.Click += new System.EventHandler(this.DeleteApiButton_Click);
             // 
             // customApiNameTextBox
             // 
@@ -279,7 +279,7 @@ namespace GoogleClashofClansLauncher.UI
             this.apiComboBox.Name = "apiComboBox";
             this.apiComboBox.Size = new System.Drawing.Size(350, 28);
             this.apiComboBox.TabIndex = 0;
-            this.apiComboBox.SelectedIndexChanged += new System.EventHandler(this.apiComboBox_SelectedIndexChanged);
+            this.apiComboBox.SelectedIndexChanged += new System.EventHandler(this.ApiComboBox_SelectedIndexChanged);
             // 
             // apiComboBoxLabel
             // 
@@ -305,7 +305,7 @@ namespace GoogleClashofClansLauncher.UI
             this.addCustomApiButton.TabIndex = 1;
             this.addCustomApiButton.Text = "添加自定义";
             this.addCustomApiButton.UseVisualStyleBackColor = false;
-            this.addCustomApiButton.Click += new System.EventHandler(this.addCustomApiButton_Click);
+            this.addCustomApiButton.Click += new System.EventHandler(this.AddCustomApiButton_Click);
             // 
             // appSettingsTabPage
             // 

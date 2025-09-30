@@ -10,15 +10,15 @@ public class KeyboardSimulator
     private const uint KEYDOWN = 0x0000;
     private const uint KEYUP = 0x0002;
 
-    public void KeyDown(byte keyCode) => keybd_event(keyCode, 0, KEYDOWN, IntPtr.Zero);
-    public void KeyUp(byte keyCode) => keybd_event(keyCode, 0, KEYUP, IntPtr.Zero);
-    public void KeyPress(byte keyCode)
+    public static void KeyDown(byte keyCode) => keybd_event(keyCode, 0, KEYDOWN, IntPtr.Zero);
+    public static void KeyUp(byte keyCode) => keybd_event(keyCode, 0, KEYUP, IntPtr.Zero);
+    public static void KeyPress(byte keyCode)
     {
         KeyDown(keyCode);
         System.Threading.Thread.Sleep(50);
         KeyUp(keyCode);
     }
-    public void TypeText(string text)
+    public static void TypeText(string text)
     {
         foreach (char c in text)
         {

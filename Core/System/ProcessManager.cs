@@ -6,7 +6,7 @@ namespace GoogleClashofClansLauncher.Core.System;
 
 public class ProcessManager
 {
-    public Process? StartProcess(string processPath)
+    public static Process? StartProcess(string processPath)
     {
         if (string.IsNullOrEmpty(processPath)) throw new ArgumentNullException(nameof(processPath));
         try
@@ -27,7 +27,7 @@ public class ProcessManager
         }
     }
 
-    public void CloseProcess(Process process)
+    public static void CloseProcess(Process process)
     {
         if (process == null) throw new ArgumentNullException(nameof(process));
         try

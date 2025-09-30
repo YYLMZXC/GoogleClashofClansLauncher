@@ -18,16 +18,16 @@ namespace GoogleClashofClansLauncher.UI
 {
     public partial class SettingsForm : Form
     {
-        private ImageRecognition imageRecognition;
-        private WindowManager windowManager;
+        private readonly ImageRecognition imageRecognition;
+        private readonly WindowManager windowManager;
         
         // 进程名称和窗口标题关键字
         private const string ProcessName = "crosvm";
         private const string WindowTitleKeyword = "部落冲突";
         
         // 配置文件路径
-        private string configFilePath = string.Empty;
-        private Dictionary<string, ApiInfo> apiConfigurations = new Dictionary<string, ApiInfo>();
+        private readonly string configFilePath = string.Empty;
+        private readonly Dictionary<string, ApiInfo> apiConfigurations = new Dictionary<string, ApiInfo>();
         private List<string> customApis = new List<string>();
 
         // API信息类
@@ -190,7 +190,7 @@ namespace GoogleClashofClansLauncher.UI
             }
         }
 
-        private void saveSettingsButton_Click(object sender, EventArgs e)
+        private void SaveSettingsButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -250,7 +250,7 @@ namespace GoogleClashofClansLauncher.UI
             }
         }
 
-        private void apiComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void ApiComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (apiComboBox.SelectedIndex >= 0 && apiComboBox.SelectedItem != null)
             {
@@ -286,7 +286,7 @@ namespace GoogleClashofClansLauncher.UI
             }
         }
 
-        private void addCustomApiButton_Click(object sender, EventArgs e)
+        private void AddCustomApiButton_Click(object sender, EventArgs e)
         {
             // 如果输入框是禁用的，先启用它
             if (!customApiNameTextBox.Enabled)
@@ -330,7 +330,7 @@ namespace GoogleClashofClansLauncher.UI
             statusLabel.Text = "自定义API已添加";
         }
 
-        private void editApiButton_Click(object sender, EventArgs e)
+        private void EditApiButton_Click(object sender, EventArgs e)
         {
             if (apiComboBox.SelectedIndex >= 0 && apiComboBox.SelectedItem != null)
             {
@@ -377,7 +377,7 @@ namespace GoogleClashofClansLauncher.UI
             }
         }
 
-        private void deleteApiButton_Click(object sender, EventArgs e)
+        private void DeleteApiButton_Click(object sender, EventArgs e)
         {
             if (apiComboBox.SelectedIndex >= 0 && apiComboBox.SelectedItem != null)
             {

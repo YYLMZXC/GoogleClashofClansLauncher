@@ -19,9 +19,9 @@ public class WindowManager
 
     private const int SW_RESTORE = 9;
 
-    public IntPtr FindWindowByTitle(string windowTitle) => FindWindow(null, windowTitle);
+    public static IntPtr FindWindowByTitle(string windowTitle) => FindWindow(null, windowTitle);
 
-    public bool ActivateWindow(IntPtr h)
+    public static bool ActivateWindow(IntPtr h)
     {
         if (h == IntPtr.Zero || GetForegroundWindow() == h) return true;
         try
@@ -41,7 +41,7 @@ public class WindowManager
         }
     }
 
-    public bool RestoreWindowOnly(IntPtr h)
+    public static bool RestoreWindowOnly(IntPtr h)
     {
         if (h == IntPtr.Zero) return false;
         try { return ShowWindow(h, SW_RESTORE); }

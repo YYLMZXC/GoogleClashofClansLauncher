@@ -36,7 +36,7 @@ namespace GoogleClashofClansLauncher.UI
             simulateButton.TabIndex = 3;
             simulateButton.Text = "模拟输入";
             simulateButton.UseVisualStyleBackColor = true;
-            simulateButton.Click += simulateButton_Click;
+            simulateButton.Click += SimulateButton_Click;
             // 
             // fixed123Button
             // 
@@ -46,7 +46,7 @@ namespace GoogleClashofClansLauncher.UI
             fixed123Button.TabIndex = 2;
             fixed123Button.Text = "固定输入123";
             fixed123Button.UseVisualStyleBackColor = true;
-            fixed123Button.Click += fixed123Button_Click;
+            fixed123Button.Click += Fixed123Button_Click;
             // 
             // mouseClickButton
             // 
@@ -56,7 +56,7 @@ namespace GoogleClashofClansLauncher.UI
             mouseClickButton.TabIndex = 1;
             mouseClickButton.Text = "点击测试（3 次/秒 × 10 秒）";
             mouseClickButton.UseVisualStyleBackColor = true;
-            mouseClickButton.Click += mouseClickButton_Click;
+            mouseClickButton.Click += MouseClickButton_Click;
             // 
             // settingsButton
             // 
@@ -65,7 +65,7 @@ namespace GoogleClashofClansLauncher.UI
             settingsButton.Size = new Size(30, 30);
             settingsButton.TabIndex = 0;
             settingsButton.UseVisualStyleBackColor = true;
-            settingsButton.Click += settingsButton_Click;
+            settingsButton.Click += SettingsButton_Click;
             // 
             // Form1
             // 

@@ -62,8 +62,8 @@ public sealed class ImageRecognition : IDisposable
     {
         Point pt = FindImageOnScreen(templatePath);
         if (pt == Point.Empty) return false;
-        _mouse.Move(pt.X, pt.Y);
-        _mouse.LeftClick();
+        MouseSimulator.Move(pt.X, pt.Y);
+        MouseSimulator.LeftClick();
         return true;
     }
 

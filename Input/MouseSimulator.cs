@@ -14,14 +14,14 @@ public sealed class MouseSimulator : IDisposable
     private const uint MOVE = 0x0001;
     private const uint LEFTDOWN = 0x0002, LEFTUP = 0x0004;
 
-    public void Move(int x, int y) => SetCursorPos(x, y);
-    public void LeftClick()
+    public static void Move(int x, int y) => SetCursorPos(x, y);
+    public static void LeftClick()
     {
         mouse_event(LEFTDOWN, 0, 0, 0, IntPtr.Zero);
         Thread.Sleep(20);
         mouse_event(LEFTUP, 0, 0, 0, IntPtr.Zero);
     }
-    public void ClickTest(CancellationToken token = default)
+    public static void ClickTest(CancellationToken token = default)
     {
         var (cX, cY) = (SystemInformation.PrimaryMonitorSize.Width / 2,
                         SystemInformation.PrimaryMonitorSize.Height / 2);

@@ -25,7 +25,7 @@ public partial class Form1 : Form
 
     public Form1() => InitializeComponent();
 
-    private IntPtr GetGameWindowHandle()
+    private static IntPtr GetGameWindowHandle()
     {
         foreach (var p in Process.GetProcessesByName(ProcessName))
             if (p.MainWindowTitle.Contains(Keyword, StringComparison.OrdinalIgnoreCase))
@@ -45,25 +45,25 @@ public partial class Form1 : Form
         return found;
     }
 
-    private void simulateButton_Click(object sender, EventArgs e)
+    private void SimulateButton_Click(object sender, EventArgs e)
     {
         var h = GetGameWindowHandle();
         if (h == IntPtr.Zero) { Debug.WriteLine("未找到游戏窗口"); return; }
-        _wm.RestoreWindowOnly(h);
+        WindowManager.RestoreWindowOnly(h);
         Thread.Sleep(200);
-        _kb.TypeText(inputTextBox.Text);
+        KeyboardSimulator.TypeText(inputTextBox.Text);
     }
 
-    private void fixed123Button_Click(object sender, EventArgs e)
+    private void Fixed123Button_Click(object sender, EventArgs e)
     {
         var h = GetGameWindowHandle();
         if (h == IntPtr.Zero) { Debug.WriteLine("未找到游戏窗口"); return; }
-        _wm.RestoreWindowOnly(h);
+        WindowManager.RestoreWindowOnly(h);
         Thread.Sleep(200);
-        _kb.TypeText("123");
+        KeyboardSimulator.TypeText("123");
     }
 
-    private async void mouseClickButton_Click(object sender, EventArgs e)
+    private async void MouseClickButton_Click(object sender, EventArgs e)
     {
         if (_cts != null && !_cts.IsCancellationRequested)
         {
@@ -73,17 +73,17 @@ public partial class Form1 : Form
         }
         var h = GetGameWindowHandle();
         if (h == IntPtr.Zero) { Debug.WriteLine("未找到游戏窗口"); return; }
-        _wm.RestoreWindowOnly(h);
+        WindowManager.RestoreWindowOnly(h);
         _cts = new CancellationTokenSource();
         mouseClickButton.Text = "停止点击";
         await Task.Run(() =>
         {
             var (cX, cY) = (Screen.PrimaryScreen!.Bounds.Width / 2,
                             Screen.PrimaryScreen.Bounds.Height / 2);
-            _mouse.Move(cX, cY);
+            MouseSimulator.Move(cX, cY);
             for (int i = 0; i < 30 && !_cts.Token.IsCancellationRequested; i++)
             {
-                _mouse.LeftClick();
+                MouseSimulator.LeftClick();
                 Thread.Sleep(330);
             }
         }, _cts.Token);
@@ -104,7 +104,7 @@ public partial class Form1 : Form
         }
     }
 
-    private void settingsButton_Click(object sender, EventArgs e) => new SettingsForm().ShowDialog();
+    private void SettingsButton_Click(object sender, EventArgs e) => new SettingsForm().ShowDialog();
 
     private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
     [DllImport("user32.dll")] private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
