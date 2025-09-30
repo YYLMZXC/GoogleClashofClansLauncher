@@ -1,17 +1,9 @@
-using GoogleClashofClansLauncher.Input;
-using GoogleClashofClansLauncher.Core.System;
-using GoogleClashofClansLauncher.Core.UI;
 using System.Diagnostics;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
-using System.Drawing;
-using System.IO;
-using System.Drawing.Imaging;
-using GoogleClashofClansLauncher.Core;
-using GoogleClashofClansLauncher.Game;
+using GoogleClashofClansLauncher.Input;
+using GoogleClashofClansLauncher.Core.UI;
+using System.Diagnostics;
 
 namespace GoogleClashofClansLauncher.UI
 {
