@@ -27,8 +27,8 @@ namespace GoogleClashofClansLauncher.UI
         
         // 配置文件路径
         private readonly string configFilePath = string.Empty;
-        private readonly Dictionary<string, ApiInfo> apiConfigurations = new Dictionary<string, ApiInfo>();
-        private List<string> customApis = new List<string>();
+        private readonly Dictionary<string, ApiInfo> apiConfigurations = [];
+        private List<string> customApis = [];
 
         // API信息类
         private class ApiInfo
@@ -197,8 +197,7 @@ namespace GoogleClashofClansLauncher.UI
                 // 验证API地址格式
                 if (!string.IsNullOrEmpty(apiEndpointTextBox.Text))
                 {
-                    Uri? uriResult = null;
-                    if (!Uri.TryCreate(apiEndpointTextBox.Text, UriKind.Absolute, out uriResult) ||
+                    if (!Uri.TryCreate(apiEndpointTextBox.Text, UriKind.Absolute, out Uri? uriResult) ||
                         (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
                     {
                         statusLabel.Text = "API地址格式无效";
@@ -257,9 +256,8 @@ namespace GoogleClashofClansLauncher.UI
                 string selectedApi = apiComboBox.SelectedItem?.ToString() ?? string.Empty;
 
                 // 检查是否是预定义API
-                if (apiConfigurations.ContainsKey(selectedApi))
+                if (apiConfigurations.TryGetValue(selectedApi, out ApiInfo? apiInfo))
                 {
-                    ApiInfo apiInfo = apiConfigurations[selectedApi];
                     apiEndpointTextBox.Text = apiInfo.Endpoint;
                     apiKeyTextBox.Text = apiInfo.Key;
                     apiTypeLabel.Text = "官方API";

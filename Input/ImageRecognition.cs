@@ -58,7 +58,7 @@ public sealed class ImageRecognition : IDisposable
         return Point.Empty;
     }
 
-    public bool RecognizeAndClickImage(string templatePath)
+    public static bool RecognizeAndClickImage(string templatePath)
     {
         Point pt = FindImageOnScreen(templatePath);
         if (pt == Point.Empty) return false;

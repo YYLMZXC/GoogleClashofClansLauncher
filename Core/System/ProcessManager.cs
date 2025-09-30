@@ -29,7 +29,7 @@ public class ProcessManager
 
     public static void CloseProcess(Process process)
     {
-        if (process == null) throw new ArgumentNullException(nameof(process));
+        ArgumentNullException.ThrowIfNull(process);
         try
         {
             if (!process.HasExited)
