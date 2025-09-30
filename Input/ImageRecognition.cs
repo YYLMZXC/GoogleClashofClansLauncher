@@ -30,7 +30,7 @@ public sealed class ImageRecognition : IDisposable
     private readonly MouseSimulator _mouse = new();
     private bool _disposed;
 
-    public Bitmap CaptureScreen()
+    public static Bitmap CaptureScreen()
     {
         int w = GetSystemMetrics(SM_CXSCREEN);
         int h = GetSystemMetrics(SM_CYSCREEN);
@@ -45,7 +45,7 @@ public sealed class ImageRecognition : IDisposable
         return bmp;
     }
 
-    public Point FindImageOnScreen(string templatePath, double threshold = 0.8)
+    public static Point FindImageOnScreen(string templatePath, double threshold = 0.8)
     {
         if (!File.Exists(templatePath)) return Point.Empty;
         using Bitmap tpl = new(templatePath);
