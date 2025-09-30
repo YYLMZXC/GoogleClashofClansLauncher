@@ -197,7 +197,7 @@ namespace GoogleClashofClansLauncher.UI
                 // 验证API地址格式
                 if (!string.IsNullOrEmpty(apiEndpointTextBox.Text))
                 {
-                    Uri uriResult;
+                    Uri? uriResult = null;
                     if (!Uri.TryCreate(apiEndpointTextBox.Text, UriKind.Absolute, out uriResult) ||
                         (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps))
                     {

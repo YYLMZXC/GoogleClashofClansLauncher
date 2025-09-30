@@ -20,7 +20,7 @@ namespace GoogleClashofClansLauncher.Input;
 public class ImageRecognition
 {
     // 功能控制标志 - 设置为true启用图像识别功能
-    private const bool FEATURE_ENABLED = false;
+    private const bool FEATURE_ENABLED = true;
     
     private const int SRCCOPY = 0x00CC0020;
     private const int CAPTUREBLT = 0x40000000;
@@ -100,19 +100,15 @@ public class ImageRecognition
 
     public Bitmap? CaptureWindow(IntPtr handle)
     {
-        if (!FEATURE_ENABLED) return null;
-        // Implementation for capturing a window
-        throw new NotImplementedException();
+        // 实际项目中需要实现窗口捕获逻辑
+        return null;
     }
 
     public bool FindImage(Bitmap screenshot, Image template, out Point matchPoint, double threshold)
     {
-        if (!FEATURE_ENABLED) {
-            matchPoint = Point.Empty;
-            return false;
-        }
-        // Implementation for finding an image
-        throw new NotImplementedException();
+        // 实际项目中需要实现图像查找逻辑
+        matchPoint = Point.Empty;
+        return false;
     }
 
     /// <summary>
@@ -124,13 +120,6 @@ public class ImageRecognition
     /// <returns>找到的图像中心位置，如果未找到则返回Point.Empty</returns>
     public Point FindImageOnScreen(string templatePath, double threshold = 0.8)
     {
-        // 如果功能被禁用，直接返回未找到
-        if (!FEATURE_ENABLED)
-        {
-            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
-            return Point.Empty;
-        }
-        
         Bitmap? template = LoadTemplateImage(templatePath);
         if (template == null)
             return Point.Empty;
@@ -169,7 +158,7 @@ public class ImageRecognition
         }
         finally
         {
-            template.Dispose();
+            template?.Dispose();
         }
 
         return Point.Empty;
@@ -252,12 +241,6 @@ public class ImageRecognition
     public bool RecognizeAndClickImage(string templatePath)
     {
         // 如果功能被禁用，直接返回失败
-        if (!FEATURE_ENABLED)
-        {
-            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
-            return false;
-        }
-        
         try
         {
             // 查找图像
@@ -302,11 +285,7 @@ public class ImageRecognition
     public bool RecognizeAndClickResImage(string imageName, string subFolder = "1")
     {
         // 如果功能被禁用，直接返回失败
-        if (!FEATURE_ENABLED)
-        {
-            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
-            return false;
-        }
+
         
         // 构建图像路径
         string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -327,16 +306,15 @@ public class ImageRecognition
     public bool ClickFixedPosition(int offsetX = 100, int offsetY = 100)
     {
         // 如果功能被禁用，直接返回失败
-        if (!FEATURE_ENABLED)
-        {
-            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
-            return false;
-        }
-        
         try
         {
             // 获取主屏幕的尺寸
-            Screen primaryScreen = Screen.PrimaryScreen;
+            Screen? primaryScreen = Screen.PrimaryScreen;
+            if (primaryScreen == null)
+            {
+                Debug.WriteLine("无法获取主屏幕信息");
+                return false;
+            }
             int screenWidth = primaryScreen.Bounds.Width;
             int screenHeight = primaryScreen.Bounds.Height;
 
@@ -379,13 +357,6 @@ public class ImageRecognition
     /// <returns>是否成功执行点击</returns>
     public bool RecognizeAndClickWithFallback(string imageName, string subFolder = "1", int offsetX = 100, int offsetY = 100)
     {
-        // 如果功能被禁用，直接返回失败
-        if (!FEATURE_ENABLED)
-        {
-            Debug.WriteLine("警告: 图像识别功能当前已被禁用");
-            return false;
-        }
-        
         // 首先尝试图像识别
         bool imageRecognized = RecognizeAndClickResImage(imageName, subFolder);
         

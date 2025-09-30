@@ -3,7 +3,6 @@ using System.Text;
 using System.Runtime.InteropServices;
 using GoogleClashofClansLauncher.Input;
 using GoogleClashofClansLauncher.Core.UI;
-using System.Diagnostics;
 
 namespace GoogleClashofClansLauncher.UI
 {

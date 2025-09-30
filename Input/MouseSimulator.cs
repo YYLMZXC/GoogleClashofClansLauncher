@@ -152,7 +152,7 @@ public class MouseSimulator
     /// </summary>
     /// <param name="cancellationToken">取消令牌</param>
     /// <param name="progressCallback">进度回调函数</param>
-    public void ExecuteClickTest(CancellationToken cancellationToken, Action<int> progressCallback = null)
+    public void ExecuteClickTest(CancellationToken cancellationToken, Action<int>? progressCallback = null)
     {
         int clickCount = 0;
         try
@@ -171,7 +171,10 @@ public class MouseSimulator
                 clickCount++;
 
                 // 调用进度回调
-                progressCallback?.Invoke(clickCount);
+                if (progressCallback != null)
+                {
+                    progressCallback(clickCount);
+                }
 
                 // 等待下一次点击
                 System.Threading.Thread.Sleep(1000);
