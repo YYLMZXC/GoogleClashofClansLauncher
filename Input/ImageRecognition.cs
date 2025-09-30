@@ -1,4 +1,4 @@
-
+#pragma warning disable CA1416
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -35,11 +35,53 @@ public sealed class ImageRecognition : IDisposable
         int w = GetSystemMetrics(SM_CXSCREEN);
         int h = GetSystemMetrics(SM_CYSCREEN);
         IntPtr hScreen = GetDC(IntPtr.Zero);
+        if (hScreen == IntPtr.Zero)
+        {
+            throw new InvalidOperationException("获取屏幕设备上下文失败！");
+        }
+
         IntPtr hMem = CreateCompatibleDC(hScreen);
+        if (hMem == IntPtr.Zero)
+        {
+            ReleaseDC(IntPtr.Zero, hScreen);
+            throw new InvalidOperationException("创建内存设备上下文失败！");
+        }
+
         IntPtr hBmp = CreateCompatibleBitmap(hScreen, w, h);
+        if (hBmp == IntPtr.Zero)
+        {
+            DeleteDC(hMem);
+            ReleaseDC(IntPtr.Zero, hScreen);
+            throw new InvalidOperationException("创建兼容位图失败！");
+        }
+
         IntPtr hOld = SelectObject(hMem, hBmp);
-        BitBlt(hMem, 0, 0, w, h, hScreen, 0, 0, SRCCOPY);
-        SelectObject(hMem, hOld); DeleteDC(hMem); ReleaseDC(IntPtr.Zero, hScreen);
+        if (hOld == IntPtr.Zero)
+        {
+            DeleteObject(hBmp);
+            DeleteDC(hMem);
+            ReleaseDC(IntPtr.Zero, hScreen);
+            throw new InvalidOperationException("选择对象失败！");
+        }
+
+        if (!BitBlt(hMem, 0, 0, w, h, hScreen, 0, 0, SRCCOPY))
+        {
+            SelectObject(hMem, hOld);
+            DeleteObject(hBmp);
+            DeleteDC(hMem);
+            ReleaseDC(IntPtr.Zero, hScreen);
+            throw new InvalidOperationException("位块传输失败！");
+        }
+
+        SelectObject(hMem, hOld);
+        DeleteDC(hMem);
+
+        int releaseResult = ReleaseDC(IntPtr.Zero, hScreen);
+        if (releaseResult == 0)
+        {
+            throw new InvalidOperationException("释放设备上下文失败！");
+        }
+
         Bitmap bmp = Image.FromHbitmap(hBmp);
         DeleteObject(hBmp);
         return bmp;

@@ -1,4 +1,3 @@
-
 using System.IO;
 using System.Text.Json;
 
@@ -13,6 +12,8 @@ public static class ConfigManager
         FILE_NAME);
 
     private static AppConfig? _cfg;
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new() { WriteIndented = true };
+
     public static AppConfig GetConfig()
     {
         if (_cfg == null) Load();
@@ -24,7 +25,7 @@ public static class ConfigManager
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-            File.WriteAllText(_path, JsonSerializer.Serialize(_cfg, new JsonSerializerOptions { WriteIndented = true }));
+            File.WriteAllText(_path, JsonSerializer.Serialize(_cfg, _jsonSerializerOptions));
         }
         catch { /* silent */ }
     }
@@ -34,7 +35,7 @@ public static class ConfigManager
         try
         {
             if (File.Exists(_path))
-                _cfg = JsonSerializer.Deserialize<AppConfig>(File.ReadAllText(_path));
+                _cfg = JsonSerializer.Deserialize<AppConfig>(File.ReadAllText(_path), _jsonSerializerOptions);
         }
         catch { /* silent */ }
     }
@@ -66,7 +67,7 @@ public class GameConfig
 public class APIConfig
 {
     public string ApiKey { get; set; } = string.Empty;
-    public string ApiUrl { get; set; } = "https://api.example.com";
+    public string ApiUrl { get; set; } = "https://api.example.com ";
     public int Timeout { get; set; } = 30000;
     public bool EnableLogging { get; set; }
 }
